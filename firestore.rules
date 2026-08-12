@@ -177,6 +177,36 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      // Records & Portfolio (module H), all server-written via Admin SDK.
+      //
+      // School Years carry the reporting-period lifecycle; the terminal
+      // Completed/Partial/Withdrawn transition is a Household-Owner-only act
+      // (§13). Adults read within scope; clients never write (completion runs
+      // through records.ts under fail-closed authorize). Portfolio Snapshots are
+      // the IMMUTABLE, parent-approved record-of-truth: no client write, and a
+      // snapshot is never mutated (invariant 5) — a logged Owner reopen
+      // SUPERSEDES with a new draft, and an authorized export-first request may
+      // WHOLLY delete it (mutation ≠ existence, §14). Answer-key / teacher-guide
+      // material never appears in a snapshot (invariant 2, enforced in assembly).
+      // A Student reads their OWN portfolio (scope-checked); reviewers within scope.
+      match /schoolYears/{yearId} {
+        allow read: if isAdult(hid)
+          && reviewerCanSeeStudent(hid, resource.data.studentId);
+        allow write: if false;
+      }
+      match /portfolioSnapshots/{snapId} {
+        allow read: if (isAdult(hid) && reviewerCanSeeStudent(hid, resource.data.studentId));
+        allow write: if false; // immutable, server-written; supersede/delete via server
+      }
+
+      // Deletion ledger (module K): the CONTENT-FREE record that data was deleted
+      // and under what basis — never the deleted content (§14). Durable (Tier 3),
+      // Owner-read only; append-only and server-written (clients never write).
+      match /deletionLedger/{ledgerId} {
+        allow read: if isOwner(hid);
+        allow write: if false;
+      }
+
       // Household AI allowance/reserve snapshot: server-managed (module J).
       // Owner may read; clients never write.
       match /allowance/{aid} {

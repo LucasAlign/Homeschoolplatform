@@ -32,7 +32,11 @@ export type RecordType =
   | 'mastery_record'
   | 'remediation_draft'
   | 'review_flag'
-  | 'notification';
+  | 'notification'
+  | 'school_year'
+  | 'portfolio_snapshot'
+  | 'deletion'
+  | 'export';
 
 type Matrix = Record<RecordType, Partial<Record<Role, Action[]>>>;
 
@@ -166,6 +170,37 @@ export const CAPABILITY_MATRIX: Matrix = {
     household_owner: ['read'],
     parent_admin: ['read'],
     instructor_reviewer: ['read'],
+  },
+  // School Years (module H): School-Year COMPLETION is Household-Owner-only
+  // (§13, Owner-only lifecycle) — the Owner alone `approve`s the terminal
+  // Completed/Partial/Withdrawn transition that freezes the record. Parent Admins
+  // and reviewers read within scope; a Parent Admin has academic authority but
+  // NOT lifecycle authority, so it never writes/approves a year.
+  school_year: {
+    household_owner: ['read', 'write', 'approve'],
+    parent_admin: ['read'],
+    instructor_reviewer: ['read'],
+  },
+  // Portfolio Snapshots (module H): immutable, parent-approved records. Approval
+  // (freezing the immutable copy) and reopen (supersession) are Household-Owner-
+  // only lifecycle acts. Adults read within scope; a Student reads their OWN
+  // portfolio. No mutation — corrections supersede (invariant 5).
+  portfolio_snapshot: {
+    household_owner: ['read', 'write', 'approve'],
+    parent_admin: ['read'],
+    instructor_reviewer: ['read'],
+    student: ['read'],
+  },
+  // Deletion (module K): cascading hard-delete requests are Household-Owner-only
+  // (§13/§14). `approve` is the authorizing act; the content-free ledger is
+  // owner-read.
+  deletion: {
+    household_owner: ['read', 'write', 'approve'],
+  },
+  // Export (module K): portable household-scoped export is Household-Owner-only
+  // (§14). `approve` authorizes generating the export bundles.
+  export: {
+    household_owner: ['read', 'write', 'approve'],
   },
 };
 
