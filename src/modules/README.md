@@ -17,7 +17,7 @@ sensitive server access calls `identity/authorize` first (fail-closed).
 | F. Mastery & Adaptation | `mastery/` | 🚧 Phase 4 — Mastery lifecycle + canonical scale, multi-signal adaptation gating |
 | G. Review & Notifications | `review/` | 🚧 Phase 5 — Review Flag lifecycle, neutral evidence-backed signal classification (no surveillance), notification-tier routing, daily-queue/weekly-digest aggregation |
 | H. Records & Portfolio | `records/` | 🚧 Phase 6 — School-Year completion (Owner-only, gated), immutable self-contained Portfolio Snapshot with answer-key/adult-content exclusion filter + reopen supersession |
-| I. Billing & Subscription | _(Phase 7)_ | ⬜ |
+| I. Billing & Subscription | `billing/` | 🚧 Phase 7 — annual school-year subscription state machine, pricing (per-active-Student base + ordinal sibling discount + free adults), allowance provisioning (funds module J's `AllowanceState`: pooled included units + per-Student protected reserve + period reset), overage authorization (default $0 hard cap, capped/revocable Owner-only consent → $0); reserve funding independent of overage; deferred payment-processor interface (no card/bank credentials) |
 | J. AI Policy Gateway & Metering | _(Phase 1)_ | ⬜ |
 
 **Canonical contract:** async produces drafts, adults produce truth — a parent

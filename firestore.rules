@@ -207,9 +207,27 @@ service cloud.firestore {
         allow write: if false;
       }
 
-      // Household AI allowance/reserve snapshot: server-managed (module J).
-      // Owner may read; clients never write.
+      // Household AI allowance/reserve snapshot: server-managed (module J),
+      // FUNDED by billing (module I). Owner may read; clients never write.
       match /allowance/{aid} {
+        allow read: if isOwner(hid);
+        allow write: if false;
+      }
+
+      // Billing & Subscription (module I), all server-written via Admin SDK.
+      //
+      // Billing is HOUSEHOLD-OWNER-only (§13). The subscription record and the
+      // overage-consent records are Owner-read only; clients never write (the
+      // server is the single writer, under fail-closed authorize). Overage
+      // consents are append-only immutable receipts — an authorization and its
+      // revocation are separate records; the $0 default is enforced server-side
+      // and the ceiling is bounded by a hard maximum. NO card/bank/account
+      // credential is ever stored — only opaque processor references.
+      match /subscriptions/{subId} {
+        allow read: if isOwner(hid);
+        allow write: if false;
+      }
+      match /overageConsents/{ocId} {
         allow read: if isOwner(hid);
         allow write: if false;
       }

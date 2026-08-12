@@ -36,7 +36,9 @@ export type RecordType =
   | 'school_year'
   | 'portfolio_snapshot'
   | 'deletion'
-  | 'export';
+  | 'export'
+  | 'subscription'
+  | 'overage';
 
 type Matrix = Record<RecordType, Partial<Record<Role, Action[]>>>;
 
@@ -200,6 +202,19 @@ export const CAPABILITY_MATRIX: Matrix = {
   // Export (module K): portable household-scoped export is Household-Owner-only
   // (§14). `approve` authorizes generating the export bundles.
   export: {
+    household_owner: ['read', 'write', 'approve'],
+  },
+  // Subscription (module I): billing is HOUSEHOLD-OWNER-only (§13). The Owner
+  // activates/transitions the subscription and provisions the period allowance;
+  // a Parent Admin has academic authority but NOT billing authority, so it gets
+  // no access here. Server-written; clients never write.
+  subscription: {
+    household_owner: ['read', 'write'],
+  },
+  // Overage (module I): lifting the default $0 hard cap is an explicit, capped,
+  // revocable, Household-Owner-only authorization (§12). `approve` is the
+  // authorizing act (mirrors consent); revocation returns the ceiling to $0.
+  overage: {
     household_owner: ['read', 'write', 'approve'],
   },
 };
