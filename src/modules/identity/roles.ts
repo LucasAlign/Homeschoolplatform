@@ -20,7 +20,9 @@ export type RecordType =
   | 'student'
   | 'consent'
   | 'audit'
-  | 'answer_key';
+  | 'answer_key'
+  | 'import'
+  | 'course';
 
 type Matrix = Record<RecordType, Partial<Record<Role, Action[]>>>;
 
@@ -54,6 +56,19 @@ export const CAPABILITY_MATRIX: Matrix = {
   // Answer keys / teacher guides: no role has client access. Adult access is a
   // separate, audited server path only (invariant 2).
   answer_key: {},
+  // Curriculum imports: parent+ create/manage; adults may read progress.
+  import: {
+    household_owner: ['read', 'write', 'approve'],
+    parent_admin: ['read', 'write', 'approve'],
+    instructor_reviewer: ['read'],
+  },
+  // Courses: parent+ author and approve; reviewers/students read (scope-checked).
+  course: {
+    household_owner: ['read', 'write', 'approve'],
+    parent_admin: ['read', 'write', 'approve'],
+    instructor_reviewer: ['read'],
+    student: ['read'],
+  },
 };
 
 export function roleCan(role: Role, record: RecordType, action: Action): boolean {

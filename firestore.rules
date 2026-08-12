@@ -65,6 +65,34 @@ service cloud.firestore {
         allow delete: if isParentPlus(hid);
       }
 
+      // Curriculum imports: server-written (module B via Admin SDK). Adults may
+      // read progress within scope; clients never write directly.
+      match /imports/{importId} {
+        allow read: if isAdult(hid);
+        allow write: if false;
+
+        // Extracted drafts are advisory and adult-only until Approved. Never
+        // student-readable (they may contain unresolved/answer-adjacent content).
+        match /draft/{d} {
+          allow read: if isParentPlus(hid);
+          allow write: if false;
+        }
+      }
+
+      // Courses: materialized on parent approval (server-written). Adults read
+      // within scope; Student read arrives with course adoption in Phase 2.
+      match /courses/{courseId} {
+        allow read: if isAdult(hid);
+        allow write: if false;
+      }
+
+      // Household AI allowance/reserve snapshot: server-managed (module J).
+      // Owner may read; clients never write.
+      match /allowance/{aid} {
+        allow read: if isOwner(hid);
+        allow write: if false;
+      }
+
       // Consent receipts: server-written (module K). Owner may read; clients never write.
       match /consents/{cid} {
         allow read: if isOwner(hid);
