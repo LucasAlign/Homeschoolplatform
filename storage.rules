@@ -1,0 +1,19 @@
+rules_version = '2';
+
+// Phase 0 foundation Storage rules: deny-by-default, server-only.
+//
+// Storage rules use OR semantics across matching blocks, so a broad allow
+// would override a narrower deny. To keep answer-key / teacher-guide objects
+// (invariant 2) isolated, Phase 0 grants NO client object access at all —
+// all objects are read/written only via the server (Admin SDK) through an
+// audited path. Consent-gated Evidence/submission upload paths (issue #15)
+// are added in later phases as explicit, narrowly-scoped allows that never
+// cover the answer-keys prefix.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

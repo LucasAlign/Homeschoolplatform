@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "emulators": "firebase emulators:start",
+    "emulators:seed": "firebase emulators:exec --only auth,firestore \"node --experimental-strip-types scripts/seed-emulator.ts\"",
+    "test:rules": "firebase emulators:exec --only firestore \"vitest run tests/rules\"",
     "db:push": "prisma db push",
     "db:seed": "node --experimental-strip-types prisma/seed.ts",
     "db:studio": "prisma studio",
@@ -14,20 +17,25 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "firebase": "^12.17.1",
+    "firebase-admin": "^13.10.0",
     "next": "16.3.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
+    "firebase-tools": "^14.0.0",
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.0.0"
   },
   "allowScripts": {
     "@prisma/engines@6.19.3": true,
