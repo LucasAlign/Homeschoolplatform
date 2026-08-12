@@ -245,6 +245,22 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      // Pilot instrumentation (Phase 8), all server-written via Admin SDK.
+      //
+      // Telemetry is METADATA-ONLY (§15/§18): the server validates every event
+      // content-free (assertMetadataOnly) before writing — no Student content or
+      // PII ever lands here. The go/no-go scorecard is the launch decision (§18),
+      // an Owner-only concern. Both are Owner-read; clients NEVER write (the
+      // server is the single writer under fail-closed authorize).
+      match /pilotTelemetry/{eventId} {
+        allow read: if isOwner(hid);
+        allow write: if false;
+      }
+      match /pilotScorecard/{scoreId} {
+        allow read: if isOwner(hid);
+        allow write: if false;
+      }
+
       // Answer Keys / Teacher Guides: adult-only material, isolated from ALL
       // client access (invariant 2). Reached only via the server through a
       // separate audited path.

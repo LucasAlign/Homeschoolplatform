@@ -38,7 +38,9 @@ export type RecordType =
   | 'deletion'
   | 'export'
   | 'subscription'
-  | 'overage';
+  | 'overage'
+  | 'pilot_telemetry'
+  | 'pilot_scorecard';
 
 type Matrix = Record<RecordType, Partial<Record<Role, Action[]>>>;
 
@@ -216,6 +218,19 @@ export const CAPABILITY_MATRIX: Matrix = {
   // authorizing act (mirrors consent); revocation returns the ceiling to $0.
   overage: {
     household_owner: ['read', 'write', 'approve'],
+  },
+  // Pilot telemetry (module — Phase 8): metadata-only, server-written pilot
+  // instrumentation (§18). No role writes via a client (the server is the single
+  // writer under the metadata-only gate); the Household Owner reads the household's
+  // own aggregates. Never carries Student content/PII (§15).
+  pilot_telemetry: {
+    household_owner: ['read'],
+  },
+  // Pilot scorecard (module — Phase 8): the launch go/no-go decision (§18). The
+  // founder Household Owner is the launch decision-maker, so evaluating/writing it
+  // is an Owner-only `approve`; the Owner reads the result. Server-written only.
+  pilot_scorecard: {
+    household_owner: ['read', 'approve'],
   },
 };
 
