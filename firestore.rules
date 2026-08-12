@@ -157,6 +157,26 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      // Review & Notifications (module G), all server-written via Admin SDK.
+      //
+      // Review Flags are NEUTRAL, evidence-backed requests for adult attention;
+      // they never block learning and are never student-readable (a flag is a
+      // request FOR adults). Adults read within scope; resolution is a server
+      // operation (review.ts) under fail-closed authorize — clients never write.
+      // Notifications are the cadence records (Immediate / Daily / Weekly),
+      // server-routed and adult-read; clients never write. Answer-key material
+      // never appears in either record (invariant 2).
+      match /reviewFlags/{flagId} {
+        allow read: if isAdult(hid)
+          && reviewerCanSeeStudent(hid, resource.data.studentId);
+        allow write: if false;
+      }
+      match /notifications/{noteId} {
+        allow read: if isAdult(hid)
+          && reviewerCanSeeStudent(hid, resource.data.studentId);
+        allow write: if false;
+      }
+
       // Household AI allowance/reserve snapshot: server-managed (module J).
       // Owner may read; clients never write.
       match /allowance/{aid} {

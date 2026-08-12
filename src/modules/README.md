@@ -15,7 +15,7 @@ sensitive server access calls `identity/authorize` first (fail-closed).
 | D. Daily Work & Submission | `daily-work/` | 🚧 Phase 3 — submission machine, Evidence Policy, offline queue, scaffolded tutor |
 | E. Assessment & Grading | `assessment/` | 🚧 Phase 4 — assessment worker, disclosure gate, grade-approval routing, immutable Official Grade + supersession |
 | F. Mastery & Adaptation | `mastery/` | 🚧 Phase 4 — Mastery lifecycle + canonical scale, multi-signal adaptation gating |
-| G. Review & Notifications | _(Phase 5)_ | ⬜ |
+| G. Review & Notifications | `review/` | 🚧 Phase 5 — Review Flag lifecycle, neutral evidence-backed signal classification (no surveillance), notification-tier routing, daily-queue/weekly-digest aggregation |
 | H. Records & Portfolio | _(Phase 6)_ | ⬜ |
 | I. Billing & Subscription | _(Phase 7)_ | ⬜ |
 | J. AI Policy Gateway & Metering | _(Phase 1)_ | ⬜ |

@@ -30,7 +30,9 @@ export type RecordType =
   | 'ai_assessment'
   | 'official_grade'
   | 'mastery_record'
-  | 'remediation_draft';
+  | 'remediation_draft'
+  | 'review_flag'
+  | 'notification';
 
 type Matrix = Record<RecordType, Partial<Record<Role, Action[]>>>;
 
@@ -145,6 +147,24 @@ export const CAPABILITY_MATRIX: Matrix = {
   remediation_draft: {
     household_owner: ['read', 'write', 'approve'],
     parent_admin: ['read', 'write', 'approve'],
+    instructor_reviewer: ['read'],
+  },
+  // Review Flags (module G): neutral, evidence-backed requests for adult
+  // attention. Server-raised from a signal; a flag NEVER blocks learning. Adults
+  // read and RESOLVE them (`write` records the neutral outcome); a Student NEVER
+  // resolves a flag and gets no access here. Instructor Reviewers resolve only
+  // within their student scope (checked in review.ts), reflected as `write`.
+  review_flag: {
+    household_owner: ['read', 'write'],
+    parent_admin: ['read', 'write'],
+    instructor_reviewer: ['read', 'write'],
+  },
+  // Notifications (module G): server-written cadence records (Immediate / Daily /
+  // Weekly). Adults read within scope; no role writes via client and none
+  // approves — routing and delivery are server concerns.
+  notification: {
+    household_owner: ['read'],
+    parent_admin: ['read'],
     instructor_reviewer: ['read'],
   },
 };
