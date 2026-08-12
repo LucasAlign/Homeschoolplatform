@@ -25,8 +25,8 @@ The non-negotiable MVP loop:
 
 | Phase | Name | Ships | Modules | Status |
 |-------|------|-------|---------|--------|
-| **0** | Foundation | Firebase project in `us-east4`; Auth, App Check, Firestore, Storage; IAM + server-side fail-closed authorization; Household + roles; consent gate; audit log. Replaces the legacy Prisma/SQLite scaffold. | A, K(min), L | 🚧 Current focus |
-| **1** | Curriculum Ingestion *(MVP core)* | Import → page-chunked OCR → multimodal extraction → parent-approved Course draft; answer-key isolation; AI policy gateway + per-Student metering + cost caps | B, J | ⬜ Planned |
+| **0** | Foundation | Firebase project in `us-east4`; Auth, App Check, Firestore, Storage; IAM + server-side fail-closed authorization; Household + roles; consent gate; audit log. Replaces the legacy Prisma/SQLite scaffold. | A, K(min), L | 🚧 Scaffolded — exit-gate rules tests need JDK 11+ to run |
+| **1** | Curriculum Ingestion *(MVP core)* | Import → page-chunked OCR → multimodal extraction → parent-approved Course draft; answer-key isolation; AI policy gateway + per-Student metering + cost caps | B, J | 🚧 In progress — state machine, gateway & metering built + unit-tested; real OCR/vendor + UI pending |
 | **2** | Planning & Scheduling | Proposed Schedule → immutable Plan Revision → Approved Plan; School Calendar; bounded deferral/reflow | C | ⬜ Planned |
 | **3** | Daily Work & Submission | Age-adapted student experience (1-3 / 4-8 / 9-12); Evidence capture; offline PWA queue; scaffolded tutor + Support Events | D | ⬜ Planned |
 | **4** | Assessment & Grading | Advisory AI Assessment + disclosure envelope; parent approval queue; immutable Official Grade; Mastery Records | E, F | ⬜ Planned |
