@@ -22,7 +22,8 @@ export type RecordType =
   | 'audit'
   | 'answer_key'
   | 'import'
-  | 'course';
+  | 'course'
+  | 'plan';
 
 type Matrix = Record<RecordType, Partial<Record<Role, Action[]>>>;
 
@@ -64,6 +65,15 @@ export const CAPABILITY_MATRIX: Matrix = {
   },
   // Courses: parent+ author and approve; reviewers/students read (scope-checked).
   course: {
+    household_owner: ['read', 'write', 'approve'],
+    parent_admin: ['read', 'write', 'approve'],
+    instructor_reviewer: ['read'],
+    student: ['read'],
+  },
+  // Plans: parent+ propose and approve into immutable revisions; students read
+  // their Approved Plan (bounded reorder/defer is handled by module C guards,
+  // not by granting plan-write). Reviewers read within scope.
+  plan: {
     household_owner: ['read', 'write', 'approve'],
     parent_admin: ['read', 'write', 'approve'],
     instructor_reviewer: ['read'],

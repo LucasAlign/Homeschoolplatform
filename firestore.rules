@@ -86,6 +86,23 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      // Planning (module C), all server-written via Admin SDK.
+      // Proposed Schedules are advisory drafts; Plan Revisions are immutable;
+      // the Approved Plan is a pointer to the current revision. Student-scoped
+      // read arrives with the student-profile linkage in a later phase.
+      match /proposals/{pid} {
+        allow read: if isAdult(hid);
+        allow write: if false;
+      }
+      match /planRevisions/{rid} {
+        allow read: if isAdult(hid);
+        allow write: if false; // immutable, append-only, server-written
+      }
+      match /plans/{scopeKey} {
+        allow read: if isAdult(hid);
+        allow write: if false;
+      }
+
       // Household AI allowance/reserve snapshot: server-managed (module J).
       // Owner may read; clients never write.
       match /allowance/{aid} {
