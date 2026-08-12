@@ -13,8 +13,8 @@ sensitive server access calls `identity/authorize` first (fail-closed).
 | B. Curriculum Ingestion | _(Phase 1)_ | ⬜ |
 | C. Planning & Scheduling | _(Phase 2)_ | ⬜ |
 | D. Daily Work & Submission | `daily-work/` | 🚧 Phase 3 — submission machine, Evidence Policy, offline queue, scaffolded tutor |
-| E. Assessment & Grading | _(Phase 4)_ | ⬜ |
-| F. Mastery & Adaptation | _(Phase 4)_ | ⬜ |
+| E. Assessment & Grading | `assessment/` | 🚧 Phase 4 — assessment worker, disclosure gate, grade-approval routing, immutable Official Grade + supersession |
+| F. Mastery & Adaptation | `mastery/` | 🚧 Phase 4 — Mastery lifecycle + canonical scale, multi-signal adaptation gating |
 | G. Review & Notifications | _(Phase 5)_ | ⬜ |
 | H. Records & Portfolio | _(Phase 6)_ | ⬜ |
 | I. Billing & Subscription | _(Phase 7)_ | ⬜ |

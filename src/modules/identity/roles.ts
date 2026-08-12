@@ -26,7 +26,11 @@ export type RecordType =
   | 'plan'
   | 'submission'
   | 'evidence'
-  | 'support_event';
+  | 'support_event'
+  | 'ai_assessment'
+  | 'official_grade'
+  | 'mastery_record'
+  | 'remediation_draft';
 
 type Matrix = Record<RecordType, Partial<Record<Role, Action[]>>>;
 
@@ -105,6 +109,43 @@ export const CAPABILITY_MATRIX: Matrix = {
     parent_admin: ['read'],
     instructor_reviewer: ['read'],
     student: ['read', 'write'], // own-scope tutoring turns
+  },
+  // AI Assessments (module E): advisory, server-written via the async worker.
+  // Adults read the disclosure envelope; NO role writes via client and NO role
+  // approves the assessment itself — approval happens against `official_grade`.
+  // Students never see the raw advisory assessment (they see suggested-vs-final
+  // on the Official Grade).
+  ai_assessment: {
+    household_owner: ['read'],
+    parent_admin: ['read'],
+    instructor_reviewer: ['read'],
+  },
+  // Official Grades (module E): the parent-approval gate turns an advisory
+  // assessment into an immutable Official Grade. `approve` is the ONLY path to a
+  // grade (invariant 4) and belongs to parents only — a Student NEVER grades or
+  // approves. Students read their own grade to see suggested-vs-final (§8).
+  official_grade: {
+    household_owner: ['read', 'approve'],
+    parent_admin: ['read', 'approve'],
+    instructor_reviewer: ['read'],
+    student: ['read'], // suggested-vs-final; no write, no approve
+  },
+  // Mastery Records (module F): advisory observations parents+ write; only a
+  // Parent Admin / Household Owner `approve` (confirms) a canonical level.
+  // Students read their own confirmed mastery; reviewers read within scope.
+  mastery_record: {
+    household_owner: ['read', 'write', 'approve'],
+    parent_admin: ['read', 'write', 'approve'],
+    instructor_reviewer: ['read'],
+    student: ['read'],
+  },
+  // Remediation/enrichment drafts (module F): parents+ author; a parent `approve`
+  // is required before a draft may reach Planning (invariant 4). Not student-
+  // visible until it becomes plan content the parent adopted.
+  remediation_draft: {
+    household_owner: ['read', 'write', 'approve'],
+    parent_admin: ['read', 'write', 'approve'],
+    instructor_reviewer: ['read'],
   },
 };
 

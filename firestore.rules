@@ -124,6 +124,39 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      // Assessment & grading (module E), all server-written via Admin SDK.
+      //
+      // AI Assessments are ADVISORY and carry a disclosure envelope; they are
+      // adult-only (never student-readable — a Student sees suggested-vs-final on
+      // the Official Grade, not the raw advisory assessment). Official Grades are
+      // the immutable, parent-approved record-of-truth: no client write, and a
+      // grade is never mutated or deleted (invariant 5) — resubmission SUPERSEDES
+      // with a new grade. Answer-key material never appears in either record
+      // (invariant 2). Student-scoped grade reads arrive with the student-uid ↔
+      // Student-profile linkage in a later phase (as with daily work).
+      match /aiAssessments/{aid} {
+        allow read: if isAdult(hid);
+        allow write: if false;
+      }
+      match /officialGrades/{gid} {
+        allow read: if isAdult(hid);
+        allow write: if false; // immutable, append-only, server-written
+      }
+
+      // Mastery & adaptation (module F), all server-written via Admin SDK.
+      // Mastery Records are immutable via supersession (invariant 5); a canonical
+      // level is confirmed only by a parent through the server. Remediation/
+      // enrichment drafts are advisory and adult-only until a parent approves
+      // them toward Planning — they never auto-enter a plan (invariant 4).
+      match /masteryRecords/{mid} {
+        allow read: if isAdult(hid);
+        allow write: if false;
+      }
+      match /remediationDrafts/{rid} {
+        allow read: if isAdult(hid);
+        allow write: if false;
+      }
+
       // Household AI allowance/reserve snapshot: server-managed (module J).
       // Owner may read; clients never write.
       match /allowance/{aid} {
