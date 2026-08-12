@@ -12,7 +12,7 @@ sensitive server access calls `identity/authorize` first (fail-closed).
 | L. Audit & Access Log | `audit/` | 🚧 Phase 0 — append-only audit writer |
 | B. Curriculum Ingestion | _(Phase 1)_ | ⬜ |
 | C. Planning & Scheduling | _(Phase 2)_ | ⬜ |
-| D. Daily Work & Submission | _(Phase 3)_ | ⬜ |
+| D. Daily Work & Submission | `daily-work/` | 🚧 Phase 3 — submission machine, Evidence Policy, offline queue, scaffolded tutor |
 | E. Assessment & Grading | _(Phase 4)_ | ⬜ |
 | F. Mastery & Adaptation | _(Phase 4)_ | ⬜ |
 | G. Review & Notifications | _(Phase 5)_ | ⬜ |

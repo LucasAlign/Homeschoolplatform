@@ -103,6 +103,27 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      // Daily work (module D), all server-written via Admin SDK. Submissions,
+      // Evidence, and Support Events are child-data records: the server gates
+      // every write on Active consent (assertCollectionAllowed) before it runs,
+      // so clients never write here directly. Adults read within scope;
+      // Student-scoped reads arrive with the student-uid ↔ Student-profile
+      // linkage in a later phase (as with planning). Answer-key material never
+      // appears in any of these records (invariant 2).
+      match /submissions/{subId} {
+        allow read: if isAdult(hid);
+        allow write: if false;
+      }
+      match /evidence/{evId} {
+        allow read: if isAdult(hid);
+        allow write: if false;
+      }
+      // Support Events carry assistance context; adults read, clients never write.
+      match /supportEvents/{seId} {
+        allow read: if isAdult(hid);
+        allow write: if false;
+      }
+
       // Household AI allowance/reserve snapshot: server-managed (module J).
       // Owner may read; clients never write.
       match /allowance/{aid} {

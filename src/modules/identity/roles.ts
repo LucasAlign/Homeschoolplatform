@@ -23,7 +23,10 @@ export type RecordType =
   | 'answer_key'
   | 'import'
   | 'course'
-  | 'plan';
+  | 'plan'
+  | 'submission'
+  | 'evidence'
+  | 'support_event';
 
 type Matrix = Record<RecordType, Partial<Record<Role, Action[]>>>;
 
@@ -78,6 +81,30 @@ export const CAPABILITY_MATRIX: Matrix = {
     parent_admin: ['read', 'write', 'approve'],
     instructor_reviewer: ['read'],
     student: ['read'],
+  },
+  // Daily work (module D). Parents assign and review; a Student submits within
+  // their OWN scope (write) but NEVER grades or approves — turning a Submission
+  // into an Official Grade is module E's parent-approval gate (invariant 4).
+  submission: {
+    household_owner: ['read', 'write', 'approve'],
+    parent_admin: ['read', 'write', 'approve'],
+    instructor_reviewer: ['read'],
+    student: ['read', 'write'], // own-scope submit only; no approve
+  },
+  // Evidence: Student attaches own proof-of-work (consent-gated server-side).
+  evidence: {
+    household_owner: ['read', 'write'],
+    parent_admin: ['read', 'write'],
+    instructor_reviewer: ['read'],
+    student: ['read', 'write'], // own-scope
+  },
+  // Support Events: logged assistance. The tutor writes on the Student's behalf
+  // (own-scope); adults read the assistance trail. No role approves them.
+  support_event: {
+    household_owner: ['read'],
+    parent_admin: ['read'],
+    instructor_reviewer: ['read'],
+    student: ['read', 'write'], // own-scope tutoring turns
   },
 };
 

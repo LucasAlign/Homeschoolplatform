@@ -12,8 +12,28 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+    // Deny-by-default across ALL objects. Because Storage rules combine matching
+    // allow blocks with OR semantics, this default deny is never a floor — only
+    // the explicit, narrowly-scoped allow below grants anything, and it is
+    // prefixed under households/{hid}/evidence/** so it can NEVER match the
+    // answer-keys prefix (households/{hid}/answerKeys/**), keeping adult-only
+    // material isolated (invariant 2).
     match /{allPaths=**} {
       allow read, write: if false;
+    }
+
+    // Evidence uploads (module D). A Student/parent uploads a photo/scan/file/
+    // screenshot to their own household's evidence prefix; the server then
+    // records the Evidence doc. Scope here is auth + household membership via a
+    // custom claim minted server-side at session start (households/{hid}).
+    // NOTE: true consent enforcement lives server-side — attachEvidence() calls
+    // assertCollectionAllowed() (Active consent) before recording any Evidence.
+    // Storage rules cannot read Firestore, so this block provides household +
+    // auth scoping and answer-key exclusion; it deliberately does NOT widen to
+    // any other prefix.
+    match /households/{hid}/evidence/{studentId}/{evidenceFile=**} {
+      allow read, write: if request.auth != null
+        && request.auth.token.hid == hid;
     }
   }
 }
