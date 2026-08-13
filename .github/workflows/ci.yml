@@ -41,6 +41,30 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
-# NOTE: emulator rules tests (`npm run test:rules`) are intentionally omitted —
-# they require the Firestore emulator (JDK 11+) and are run separately once a
-# JDK-provisioned job exists. See docs/launch-readiness.md §B.1.
+  # Firestore security-rules tests against the emulator. Split into its own job
+  # because it needs a JDK (the emulator is Java) — something the local dev box
+  # (JDK 1.8) can't provide, so CI is where these actually run. This exercises the
+  # Phase 0 exit gate: household isolation, role scoping, answer-key isolation,
+  # consent-field immutability, and non-writable audit. See docs/launch-readiness.md §B.1.
+  rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install (locked)
+        run: npm ci
+
+      # `firebase emulators:exec` downloads the Firestore emulator jar on first
+      # run, boots it, runs the vitest rules suite, then tears it down.
+      - name: Firestore rules tests (emulator)
+        run: npm run test:rules
