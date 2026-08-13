@@ -68,8 +68,9 @@ unit tests and the deny-by-default posture is in the rules, but the Phase 0 exit
 gate ("household isolation + fail-closed authz + consent gating pass in emulator")
 is **not** provably met until JDK 11+ is installed and `tests/rules` runs green.
 **This is the single most load-bearing unverified item.** Firestore composite
-indexes for the later-phase queries are likewise declared only when the
-emulator/index config lands.
+indexes for the current multi-field queries are declared in
+`firestore.indexes.json` (see [`firestore-indexes.md`](firestore-indexes.md)); new
+multi-field queries must add their index there as they land.
 
 ### B.2 Real vendor integrations (all stubbed) 🟡
 
