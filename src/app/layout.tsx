@@ -38,6 +38,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/approvals" className="hover:text-blue-600">
                 Approvals
               </Link>
+              <Link href="/grades" className="hover:text-blue-600">
+                Grades
+              </Link>
             </nav>
           </div>
         </header>

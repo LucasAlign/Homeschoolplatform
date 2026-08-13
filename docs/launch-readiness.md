@@ -130,8 +130,21 @@ Server Actions. It builds, type-checks, lints clean, and reuses the real
 Firebase Auth session cookies + the uid↔membership lookup are §B.6; (b) no worker
 produces `ExtractedDraft`s yet, so the queue is empty against a seeded emulator
 until §B.2/§B.6 land; (c) the flow has **not** been exercised end-to-end in-emulator
-(local JDK gate, §B.1) — only unit/tsc/build verified. The grade, plan,
-flag-review, billing, and scorecard surfaces remain ⬜.
+(local JDK gate, §B.1) — only unit/tsc/build verified.
+
+**Second flow drafted — the grade parent-approval gate** (`src/app/grades/`): a
+queue of `AssessmentReady` AI assessments and a review screen rendering the full
+mandatory disclosure envelope (§8: suggested score + rationale, confidence,
+uncertainty/unread portions, assistance context, evidence examined, AI
+provenance) with the four routing lanes (batch / individual / manual /
+parent-only). The parent can **accept** the AI suggestion or **override** with
+their own final score (divergence retained, suggested-vs-final preserved), wired
+to `approveAssessment` via Server Actions on the same `authorize()` gate. Same
+seams/caveats as the ingestion flow apply — plus one specific to display: the
+routing signals `transcribed` / `flagged` / `missingEvidence` are not yet
+persisted on the assessment, so the shown lane uses their default (false) until
+module D/G wire them through (the server approval re-derives identically). The
+plan, flag-review, billing, and scorecard surfaces remain ⬜.
 
 ### B.6 Worker / scheduler infrastructure ⬜
 
@@ -205,7 +218,7 @@ are not part of readiness.
 | Real AI/OCR/tutor/payment vendors | 🟡 stubbed behind interfaces |
 | Ingestion benchmark (#17) | ⬜ pre-pilot blocking |
 | DR restore drill | ⬜ pre-pilot blocking |
-| UI (student / parent / founder dashboards) | 🟡 ingestion parent-approval flow drafted; rest ⬜ |
+| UI (student / parent / founder dashboards) | 🟡 ingestion + grade parent-approval flows drafted; rest ⬜ |
 | Worker/scheduler infra (cascade, PDF, rollover, sweeps) | ⬜ deferred |
 | Accessibility conformance standard + tests | ⬜ standard unset |
 | Incident-response runbook + technician tooling | ⬜ pending |
