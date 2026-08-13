@@ -53,11 +53,19 @@ scorecard models these as `TargetMetric`s with a `DocumentedException` path.
 
 ## B. Cross-phase deferred / UNVERIFIED items (the blocking work)
 
-### B.1 Emulator rules tests never ran — JDK gate ⬜ **(blocks every isolation/consent/answer-key hard gate)**
+### B.1 Emulator rules tests — now run in CI ✅ (local dev still JDK-gated) 🟡
 
-Every phase from 0 onward flagged the same thing: `npm run test:rules` boots the
-Firestore emulator, which **requires JDK 11+**. This machine has **JDK 1.8**, so
-the rules tests have **never executed**. That means the client-facing Firestore
+**Update:** the CI `rules` job (`.github/workflows/ci.yml`) provisions Temurin JDK
+21 and runs `npm run test:rules` on every push/PR — so the Phase 0 exit-gate
+suite (`tests/rules/foundation.rules.test.ts`: household isolation, role scoping,
+answer-key isolation, consent-field immutability, non-writable audit) **now
+executes and passes in-emulator**. The **local** dev box still has **JDK 1.8** and
+cannot run them (install JDK 11+ to run locally). Remaining gap: the rules suite
+currently covers the Phase 0 collections; **later-phase collections'** rule
+matchers still need their own emulator tests added to `tests/rules`.
+
+Historically: `npm run test:rules` boots the Firestore emulator, which **requires
+JDK 11+**, so before CI these had **never executed** — the client-facing Firestore
 rule matchers for *every* collection — `households`, `students`, `imports`,
 `courses`, plans, `submissions`/`evidence`/`supportEvents`, `aiAssessments`/
 `officialGrades`, `masteryRecords`/`remediationDrafts`, `reviewFlags`/
@@ -177,9 +185,9 @@ are not part of readiness.
 | Area | State |
 |------|-------|
 | Domain logic (all 8 phases, pure + unit-tested) | ✅ 179 tests green, tsc + eslint clean |
-| Firestore rules authored (deny-by-default, per-collection) | 🟡 written, **unverified in-emulator (JDK 1.8)** |
-| Metadata-only pilot instrumentation + go/no-go scorecard | ✅ built + unit-tested (this phase) |
-| Emulator rules run (Phase 0 exit gate) | ⬜ **JDK 11+ needed** |
+| Firestore rules authored (deny-by-default, per-collection) | 🟡 Phase 0 collections verified in CI emulator; later-phase collections' rule tests pending |
+| Metadata-only pilot instrumentation + go/no-go scorecard | ✅ built + unit-tested |
+| Emulator rules run (Phase 0 exit gate) | ✅ **runs + passes in CI (JDK 21)**; local run still needs JDK 11+ |
 | Real AI/OCR/tutor/payment vendors | 🟡 stubbed behind interfaces |
 | Ingestion benchmark (#17) | ⬜ pre-pilot blocking |
 | DR restore drill | ⬜ pre-pilot blocking |
