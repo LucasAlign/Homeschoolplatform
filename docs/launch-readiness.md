@@ -127,10 +127,14 @@ Approve / Request correction / Reject wired to the module-B server operations vi
 Server Actions. It builds, type-checks, lints clean, and reuses the real
 `authorize()` gate on every read/write. **Not yet real:** (a) auth session is a
 **dev stub** (`src/lib/auth/session.ts`) that hard-fails in production — real
-Firebase Auth session cookies + the uid↔membership lookup are §B.6; (b) no worker
-produces `ExtractedDraft`s yet, so the queue is empty against a seeded emulator
-until §B.2/§B.6 land; (c) the flow has **not** been exercised end-to-end in-emulator
-(local JDK gate, §B.1) — only unit/tsc/build verified.
+Firebase Auth session cookies + the uid↔membership lookup are §B.6; (b) no real
+worker produces `ExtractedDraft`s yet (§B.2/§B.6) — a **demo seed**
+(`scripts/seed-emulator.ts`, `npm run seed`) now populates the queue so both flows
+are clickable against the emulator, but that is dev scaffolding, not the pipeline;
+(c) the flow has **not** been exercised end-to-end in-emulator (local JDK gate,
+§B.1) — only unit/tsc/build verified, and the seed's document shapes are
+type-checked against the domain types but its click-through is **unrun on this
+machine** (JDK 1.8; the emulator needs 11+).
 
 **Second flow drafted — the grade parent-approval gate** (`src/app/grades/`): a
 queue of `AssessmentReady` AI assessments and a review screen rendering the full

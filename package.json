@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test:unit": "vitest run tests/unit",
     "emulators": "firebase emulators:start",
+    "seed": "node --experimental-strip-types scripts/seed-emulator.ts",
     "emulators:seed": "firebase emulators:exec --only auth,firestore \"node --experimental-strip-types scripts/seed-emulator.ts\"",
     "test:rules": "firebase emulators:exec --only firestore \"vitest run tests/rules\""
   },

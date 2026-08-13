@@ -39,9 +39,12 @@ export async function getSession(): Promise<Session | null> {
         'required in production (see docs/launch-readiness.md §B.6)',
     );
   }
+  // Defaults match the demo principal seeded by scripts/seed-emulator.ts, so a
+  // freshly-seeded emulator + `npm run dev` is signed in as the seeded owner
+  // with no extra config. Override via DEV_SESSION_UID / DEV_SESSION_HOUSEHOLD.
   return {
-    uid: process.env.DEV_SESSION_UID ?? 'dev-parent',
-    householdId: process.env.DEV_SESSION_HOUSEHOLD ?? 'dev-household',
+    uid: process.env.DEV_SESSION_UID ?? 'owner-uid',
+    householdId: process.env.DEV_SESSION_HOUSEHOLD ?? 'demo-household',
   };
 }
 
