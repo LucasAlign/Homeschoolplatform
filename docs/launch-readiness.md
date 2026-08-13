@@ -110,7 +110,7 @@ region-independent US-multiregion export, RPO ~minutes/≤24h on immutable regio
 `us-east4` (99.99%, no auto-failover, knowingly chosen). The **pre-pilot restore
 drill** that proves a restore actually works has **not** been performed.
 
-### B.5 UI prototype builds (#9, #10, #11) ⬜
+### B.5 UI prototype builds (#9, #10, #11) 🟡 (first flow drafted)
 
 Throwaway import / student / evidence prototype variations, then the real
 age-adapted student experience (grades 1-3 / 4-8 / 9-12), the parent approval
@@ -119,6 +119,19 @@ management, and the founder-facing pilot scorecard dashboard. Acceptance criteri
 are fixed; the builds are not done. The reusable Next.js app shell exists; per
 [`../AGENTS.md`](../AGENTS.md), read `node_modules/next/dist/docs/` before any
 Next-specific code (this version has breaking changes).
+
+**First flow drafted — the ingestion parent-approval gate** (`src/app/approvals/`):
+a queue of `ExtractedDraft` imports and a review screen (draft tree with per-item
+confidence + source-page provenance, quality flags, batch-eligibility) with
+Approve / Request correction / Reject wired to the module-B server operations via
+Server Actions. It builds, type-checks, lints clean, and reuses the real
+`authorize()` gate on every read/write. **Not yet real:** (a) auth session is a
+**dev stub** (`src/lib/auth/session.ts`) that hard-fails in production — real
+Firebase Auth session cookies + the uid↔membership lookup are §B.6; (b) no worker
+produces `ExtractedDraft`s yet, so the queue is empty against a seeded emulator
+until §B.2/§B.6 land; (c) the flow has **not** been exercised end-to-end in-emulator
+(local JDK gate, §B.1) — only unit/tsc/build verified. The grade, plan,
+flag-review, billing, and scorecard surfaces remain ⬜.
 
 ### B.6 Worker / scheduler infrastructure ⬜
 
@@ -192,7 +205,7 @@ are not part of readiness.
 | Real AI/OCR/tutor/payment vendors | 🟡 stubbed behind interfaces |
 | Ingestion benchmark (#17) | ⬜ pre-pilot blocking |
 | DR restore drill | ⬜ pre-pilot blocking |
-| UI (student / parent / founder dashboards) | ⬜ prototypes + real builds pending |
+| UI (student / parent / founder dashboards) | 🟡 ingestion parent-approval flow drafted; rest ⬜ |
 | Worker/scheduler infra (cascade, PDF, rollover, sweeps) | ⬜ deferred |
 | Accessibility conformance standard + tests | ⬜ standard unset |
 | Incident-response runbook + technician tooling | ⬜ pending |
