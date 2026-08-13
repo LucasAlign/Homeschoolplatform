@@ -33,17 +33,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </Link>
             <nav className="flex items-center gap-6 text-sm">
               <Link href="/" className="hover:text-blue-600">
-                Dashboard
-              </Link>
-              <Link href="/courses" className="hover:text-blue-600">
-                Courses
+                Home
               </Link>
             </nav>
           </div>
         </header>
         <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">{children}</main>
         <footer className="border-t border-neutral-200 py-6 text-center text-xs text-neutral-400 dark:border-neutral-800">
-          Homeschool Platform · Phase 1 — Curriculum &amp; Lessons
+          Lucas Align Homeschool · Firebase MVP
         </footer>
       </body>
     </html>

@@ -148,12 +148,14 @@ produces `householdRef` / `studentRef` from real ids are wired during the pilot
 build-out. The retention wiring (telemetry ties to module K retention tiers) is
 part of that pass.
 
-### B.11 Legacy scaffold retirement ⬜
+### B.11 Legacy scaffold retirement ✅ **done**
 
-The pre-wayfinder **Prisma / SQLite** scaffold (`prisma/`, the `db:*` npm scripts,
-Vercel `public/` assets) predates the approved Firebase direction and is
-superseded. It was slated for retirement in Phase 0 when the Firestore data layer
-landed; it still lingers in the tree and should be removed.
+The pre-wayfinder **Prisma / SQLite** scaffold has been retired: `prisma/`, the
+`db:*` npm scripts + `prisma generate` postinstall, the `@prisma/client`/`prisma`
+deps + `allowScripts`, the Prisma-backed dashboard/courses pages (`src/lib/db.ts`,
+`src/lib/user.ts`, `src/app/actions.ts`, `src/app/courses/**`), the `DATABASE_URL`
+env, and the Vercel/starter `public/` assets are all removed. The Next.js app shell
+remains with a minimal placeholder landing page; the real UI is §B.5.
 
 ---
 

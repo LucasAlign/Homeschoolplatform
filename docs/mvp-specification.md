@@ -182,7 +182,7 @@ Accreditation / operating as a school; guaranteed state compliance; official tra
 - **Exact numeric thresholds** — pilot acceptance percentages (#5/#18), retention day-counts (#15), ingestion gates (#17) — fixed under counsel/empirical validation.
 - **Accessibility conformance standard + test plan** — accessibility is fixed as MVP scope; the specific standard remains to be set.
 - **Incident-response runbook + technician tooling** — controls fixed (#12/#18); concrete runbook remains.
-- **Retire the legacy Prisma/SQLite scaffold** (`prisma/`, `db:*` scripts, Vercel `public/` assets) during Phase 0 when the Firestore data layer lands.
+- ~~Retire the legacy Prisma/SQLite scaffold~~ — **done**: `prisma/`, `db:*` scripts, Prisma deps, the Prisma-backed pages, and Vercel/starter `public/` assets are removed; a minimal placeholder landing page remains.
 
 ## 22. Decision provenance
 

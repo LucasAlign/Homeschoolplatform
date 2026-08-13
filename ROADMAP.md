@@ -11,12 +11,6 @@ Secret Manager, Cloud Messaging). Region: **`us-east4`** (immutable, US-only chi
 > specification synthesizing the 17 approved wayfinder decisions (GitHub issues #2–#18 under map #1).
 > This roadmap is the phase-level view of that spec.
 
-> **⚠️ Legacy scaffold note.** The repository currently contains a pre-wayfinder scaffold on
-> **Prisma + SQLite** (see `prisma/`, the `db:*` npm scripts, and Vercel assets in `public/`). That
-> stack predates the approved direction and is **superseded** by this roadmap: Firebase replaces
-> Prisma/SQLite, and there are **no accredited transcripts** in scope. The Next.js app shell is
-> reusable; the data layer is replaced in Phase 0.
-
 The non-negotiable MVP loop:
 
 > **Import → AI extraction → parent approval → student checklist → evidence submission → parent review**
@@ -70,18 +64,17 @@ canonical state machines and the ten non-waivable invariants.
 
 ## Local development
 
-**Current (legacy scaffold, being replaced in Phase 0):** the app runs on Next.js with a Prisma +
-SQLite dev database.
+Next.js PWA against the **Firebase Emulator Suite** (Auth, Firestore, Storage, Functions), with
+Cloud Run workers for OCR/AI/PDF jobs. The legacy Prisma/SQLite scaffold has been retired.
 
 ```bash
-npm run dev          # start the app on http://localhost:3000
-npm run db:push      # (legacy) sync Prisma schema to the SQLite dev DB
-npm run db:seed      # (legacy) load sample curriculum
+npm install
+cp .env.example .env.local   # fill Firebase web config; keep the emulator flag "true" for local
+npm run dev                  # start the Next.js app on http://localhost:3000
+npm run emulators            # Auth + Firestore + Storage + Functions + UI (http://127.0.0.1:4000)
+npm run test:unit            # 179 pure-logic unit tests (no emulator/JDK needed)
+npm run test:rules           # emulator rules tests — requires JDK 11+
 ```
-
-**Target (from Phase 0):** Next.js PWA against the **Firebase Emulator Suite** (Auth, Firestore,
-Storage, Functions), with Cloud Run workers for OCR/AI/PDF jobs. Emulator scripts and configuration
-are established in Phase 0; the legacy `db:*` scripts are removed once the Firestore data layer lands.
 
 ## Non-negotiables
 
