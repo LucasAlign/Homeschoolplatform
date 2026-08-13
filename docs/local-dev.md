@@ -6,8 +6,16 @@ Firebase Emulator Suite with demo data.
 ## Prerequisites
 
 - **JDK 11+** — the Firestore emulator is Java. Check with `java -version`; if it
-  reports `1.8`, install a newer JDK (e.g. Temurin 21) and make sure it's on
-  `PATH` / `JAVA_HOME`. Without it the emulator will not boot.
+  reports `1.8`, install a newer JDK (e.g. `winget install EclipseAdoptium.Temurin.21.JDK`).
+  Without it the emulator will not boot.
+  - **Gotcha:** an old Oracle Java can keep shadowing the new one on `PATH` (via
+    `C:\Program Files (x86)\Common Files\Oracle\Java\javapath`). firebase-tools
+    honors **`JAVA_HOME`**, so the reliable fix is to ensure `JAVA_HOME` points at
+    the new JDK (the Temurin installer sets it machine-wide) and open a **fresh
+    terminal** so it's picked up. Verify the emulator picks it up — the startup
+    banner should not warn about an unsupported Java version. If it still does,
+    set it for the session first, e.g. PowerShell:
+    `$env:JAVA_HOME = 'C:\Program Files\Eclipse Adoptium\jdk-21.0.12.8-hotspot'`.
 - `firebase-tools` (already a dev dependency) and `npm ci` done once.
 - `.env.local` — already generated with the emulator hosts and the dev-session
   principal. (It's gitignored; see `.env.example` for the documented keys.)
