@@ -147,8 +147,20 @@ to `approveAssessment` via Server Actions on the same `authorize()` gate. Same
 seams/caveats as the ingestion flow apply — plus one specific to display: the
 routing signals `transcribed` / `flagged` / `missingEvidence` are not yet
 persisted on the assessment, so the shown lane uses their default (false) until
-module D/G wire them through (the server approval re-derives identically). The
-plan, flag-review, billing, and scorecard surfaces remain ⬜.
+module D/G wire them through (the server approval re-derives identically).
+
+**Third flow drafted — the plan parent-approval gate** (`src/app/plans/`): a queue
+of advisory Proposed Schedules and a review screen showing the change set vs the
+current revision (moved / added / removed) plus the full day-by-day schedule with
+per-day workload, wired to `approveProposal` via a Server Action on the same
+`authorize()` gate. Pending-ness is derived from optimistic concurrency (a
+proposal is hidden once stale — its `basedOnRevisionId` no longer matches the
+plan's current revision); there is deliberately no reject control (module C has no
+reject op). **Verified end-to-end on the emulator (JDK 21):** approving a change
+set materialized an immutable rev 2 superseding rev 1 (rev 1 left intact), advanced
+the plan pointer, and dropped the approved + stale siblings from the queue. Same
+dev-session / no-real-worker seams as the other flows. The flag-review, billing,
+and scorecard surfaces remain ⬜.
 
 ### B.6 Worker / scheduler infrastructure ⬜
 
@@ -222,7 +234,7 @@ are not part of readiness.
 | Real AI/OCR/tutor/payment vendors | 🟡 stubbed behind interfaces |
 | Ingestion benchmark (#17) | ⬜ pre-pilot blocking |
 | DR restore drill | ⬜ pre-pilot blocking |
-| UI (student / parent / founder dashboards) | 🟡 ingestion + grade parent-approval flows drafted; rest ⬜ |
+| UI (student / parent / founder dashboards) | 🟡 ingestion + grade + plan parent-approval flows drafted; rest ⬜ |
 | Worker/scheduler infra (cascade, PDF, rollover, sweeps) | ⬜ deferred |
 | Accessibility conformance standard + tests | ⬜ standard unset |
 | Incident-response runbook + technician tooling | ⬜ pending |

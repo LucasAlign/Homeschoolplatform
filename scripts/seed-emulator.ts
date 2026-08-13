@@ -35,6 +35,13 @@ import type {
   DisclosureEnvelope,
   OfficialGrade,
 } from '../src/modules/assessment/types';
+import type {
+  ApprovedPlan,
+  PlanRevision,
+  PlanScope,
+  ProposedSchedule,
+  ScheduledAssignment,
+} from '../src/modules/planning/types';
 
 // Default to the standard emulator host/port when not already provided (a bare
 // `npm run seed` against a running emulator). `firebase emulators:exec` sets
@@ -313,13 +320,109 @@ async function seedGrades() {
   await doc(`officialGrades/${PRIOR_GRADE.id}`).set(PRIOR_GRADE);
 }
 
+// --- Module C: proposed schedules awaiting the parent plan gate ---
+
+const scopeKey = (s: PlanScope) => `${s.studentId}__${s.schoolYearId}`;
+
+function placement(
+  assignmentId: string,
+  courseId: string,
+  date: string,
+  order: number,
+  sequenceIndex: number,
+  opts: { fixed?: boolean; deferrable?: boolean; workloadUnits?: number } = {},
+): ScheduledAssignment {
+  return {
+    assignmentId,
+    courseId,
+    date,
+    order,
+    sequenceIndex,
+    fixed: opts.fixed ?? false,
+    deferrable: opts.deferrable ?? true,
+    workloadUnits: opts.workloadUnits ?? 2,
+  };
+}
+
+// Scope A (S1): no existing plan → a first "full" proposal (shows as a new plan).
+const SCOPE_A: PlanScope = { studentId: S1, schoolYearId: 'sy-2026' };
+const PROP_NEW: ProposedSchedule = {
+  id: 'prop-new',
+  scope: SCOPE_A,
+  kind: 'full',
+  placements: [
+    placement('a-math-1', 'c-math', '2026-09-01', 0, 0),
+    placement('a-hist-1', 'c-hist', '2026-09-01', 1, 1, { fixed: true, deferrable: false, workloadUnits: 1 }),
+    placement('a-math-2', 'c-math', '2026-09-02', 0, 2),
+  ],
+  basedOnRevisionId: null,
+  advisory: true,
+  createdAt: now,
+};
+
+// Scope B (S2): an existing revision + a change_set that moves one assignment,
+// plus a STALE proposal (built on an older revision) that the queue must hide.
+const SCOPE_B: PlanScope = { studentId: S2, schoolYearId: 'sy-2026' };
+const REV_B1_PLACEMENTS: ScheduledAssignment[] = [
+  placement('b-sci-1', 'c-sci', '2026-09-01', 0, 0),
+  placement('b-sci-2', 'c-sci', '2026-09-02', 0, 1),
+  placement('b-sci-3', 'c-sci', '2026-09-03', 0, 2),
+];
+const REV_B1: PlanRevision = {
+  id: 'rev-s2-1',
+  scope: SCOPE_B,
+  revisionNumber: 1,
+  effectiveDate: '2026-08-15',
+  placements: REV_B1_PLACEMENTS,
+  supersedesRevisionId: null,
+  approvedByUid: OWNER,
+  createdAt: now - 86_400_000,
+};
+const PLAN_B: ApprovedPlan = {
+  scope: SCOPE_B,
+  currentRevisionId: REV_B1.id,
+  currentRevisionNumber: 1,
+  updatedAt: now - 86_400_000,
+};
+const PROP_CHANGE: ProposedSchedule = {
+  id: 'prop-change',
+  scope: SCOPE_B,
+  kind: 'change_set',
+  // b-sci-2 deferred 09-02 → 09-04 (one moved item in the diff).
+  placements: REV_B1_PLACEMENTS.map((p) =>
+    p.assignmentId === 'b-sci-2' ? { ...p, date: '2026-09-04' } : p,
+  ),
+  basedOnRevisionId: REV_B1.id,
+  advisory: true,
+  createdAt: now,
+};
+const PROP_STALE: ProposedSchedule = {
+  id: 'prop-stale',
+  scope: SCOPE_B,
+  kind: 'change_set',
+  placements: REV_B1_PLACEMENTS,
+  basedOnRevisionId: 'rev-s2-0', // built on a superseded revision → hidden by the queue
+  advisory: true,
+  createdAt: now,
+};
+
+async function seedPlans() {
+  await doc(`planRevisions/${REV_B1.id}`).set(REV_B1);
+  await doc(`plans/${scopeKey(SCOPE_B)}`).set(PLAN_B);
+  for (const p of [PROP_NEW, PROP_CHANGE, PROP_STALE]) {
+    await doc(`proposals/${p.id}`).set(p);
+  }
+}
+
 async function main() {
   await seedHousehold();
   await seedImports();
   await seedGrades();
+  await seedPlans();
   console.log(
     `Seeded ${HID}: owner ${OWNER} + parent ${PARENT}, 2 students, ` +
-      `${IMPORTS.length} imports awaiting approval, ${ASSESSMENTS.length} assessments awaiting grading.`,
+      `${IMPORTS.length} imports awaiting approval, ${ASSESSMENTS.length} assessments awaiting grading, ` +
+      `2 plan proposals awaiting approval (+1 stale, hidden).`,
   );
   console.log(`Emulator: ${process.env.FIRESTORE_EMULATOR_HOST}`);
 }

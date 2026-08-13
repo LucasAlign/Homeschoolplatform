@@ -53,6 +53,11 @@ Then open:
   the current grade), **parent-only** (not AI-assessable, no number). Open one to
   see the full disclosure envelope, then **Accept the AI suggestion** or enter a
   **final score to override** (the divergence is recorded).
+- **http://localhost:3000/plans** — two proposed schedules (a third, stale one is
+  hidden by the optimistic-concurrency filter): a **change set** for the second
+  student that moves one assignment (open it to see the diff vs the current
+  revision), and a **new full plan** for the first student. Approving one
+  materializes an immutable Plan Revision and advances the student's current plan.
 
 The **Approve all N ready** button on each queue clears the batch-eligible items
 in one pass.
