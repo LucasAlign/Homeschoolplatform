@@ -24,7 +24,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-500">
-      
+
       {/* ───────────────────── HEADER ───────────────────── */}
       <section className="relative border-b border-black">
         <div className="grid grid-cols-12">
@@ -53,12 +53,12 @@ export default function DashboardPage() {
             </div>
             <div className="px-6 md:px-8 py-8 border-b border-black">
               <span className="label-caps block mb-4">Quick Actions</span>
-              <Link 
-                href="/courses/new" 
+              <Link
+                href="/students/new"
                 className="w-full bg-black text-white py-4 text-[11px] uppercase font-semibold flex items-center justify-center hover:bg-white hover:text-black hover:border-black border border-black transition-colors"
                 style={{ letterSpacing: '0.2em' }}
               >
-                Create Course
+                Register Student
               </Link>
             </div>
           </div>
@@ -101,19 +101,19 @@ export default function DashboardPage() {
         {dashboard.recentCourses.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-12 border-b border-black">
             <span className="label-caps text-[#9C9C9C] mb-6">No courses yet</span>
-            <Link 
-              href="/courses/new" 
+            <Link
+              href="/students/new"
               className="bg-black text-white px-8 py-4 text-[11px] uppercase font-semibold border border-black hover:bg-white hover:text-black transition-colors"
               style={{ letterSpacing: '0.2em' }}
             >
-              Create First Course
+              Register First Student
             </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {dashboard.recentCourses.map((course, i) => (
-              <Link 
-                key={course.id} 
+              <Link
+                key={course.id}
                 href={`/courses/${course.id}`}
                 className={`group px-6 md:px-8 pt-8 pb-12 border-b border-black hover:bg-black hover:text-white transition-colors duration-150 ${i % 3 !== 2 ? 'md:border-r' : ''}`}
               >
@@ -135,7 +135,7 @@ export default function DashboardPage() {
                     {course.subject}
                   </p>
                 )}
-                
+
                 <div className="mt-8 pt-4 border-t border-black group-hover:border-[#9C9C9C] flex justify-between">
                   <span className="text-[9px] num-tab uppercase text-[#9C9C9C]" style={{ letterSpacing: '0.12em' }}>
                     {course.unitCount} UNITS

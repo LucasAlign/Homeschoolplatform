@@ -11,6 +11,8 @@ import CourseDetailPage from "@/pages/courses/detail";
 import EditCoursePage from "@/pages/courses/edit";
 import LessonEditorPage from "@/pages/lessons/editor";
 import NotFound from "@/pages/not-found";
+import NewStudentPage from "@/pages/students/new";
+import CurriculumSetupPage from "@/pages/students/curriculum";
 import { ReactNode } from "react";
 
 const queryClient = new QueryClient({
@@ -28,6 +30,8 @@ function Router() {
       <RoutedErrorBoundary>
         <Switch>
           <Route path="/" component={DashboardPage} />
+          <Route path="/students/new" component={NewStudentPage} />
+          <Route path="/students/:id/curriculum" component={CurriculumSetupPage} />
           <Route path="/courses" component={CoursesPage} />
           <Route path="/courses/new" component={NewCoursePage} />
           <Route path="/courses/:id" component={CourseDetailPage} />

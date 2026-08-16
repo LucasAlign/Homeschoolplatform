@@ -6,7 +6,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   const navItems = [
     { href: "/", label: "Dashboard" },
-    { href: "/courses", label: "Courses" },
+    { href: "/students/new", label: "Students" },
+    { href: "/courses", label: "Curriculum" },
   ];
 
   return (
