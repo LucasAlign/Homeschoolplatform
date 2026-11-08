@@ -8,6 +8,14 @@ import {
 } from "drizzle-orm/pg-core";
 import { studentsTable } from "./students";
 export type Evidence = { name: string; dataUrl: string };
+export const scheduleBatchesTable = pgTable("schedule_batches", {
+  key: text("key").primaryKey(),
+  studentId: text("student_id")
+    .notNull()
+    .references(() => studentsTable.id, { onDelete: "restrict" }),
+  fingerprint: text("fingerprint").notNull(),
+  assignmentIds: jsonb("assignment_ids").$type<string[]>().notNull(),
+});
 export const assignmentsTable = pgTable(
   "assignments",
   {

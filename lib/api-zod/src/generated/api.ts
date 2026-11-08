@@ -8,11 +8,153 @@
 import * as zod from 'zod';
 
 
-export const GetChildWorkParams = zod.object({
+export const ScheduleChildWorkParams = zod.object({
   "studentId": zod.coerce.string()
 })
 
-export const getChildWorkResponseAssignmentsItemSubmissionsItemEvidenceItemDataUrlMax = 1400000;
+export const scheduleChildWorkBodyTitleMax = 180;
+
+export const scheduleChildWorkBodyCountMax = 60;
+
+export const scheduleChildWorkBodyWeekdaysItemMin = 0;
+export const scheduleChildWorkBodyWeekdaysItemMax = 6;
+
+export const scheduleChildWorkBodyWeekdaysMax = 7;
+
+export const scheduleChildWorkBodySkipDatesDefault = [];
+export const scheduleChildWorkBodySkipDatesMax = 100;
+
+
+
+export const ScheduleChildWorkBody = zod.object({
+  "title": zod.string().max(scheduleChildWorkBodyTitleMax),
+  "subject": zod.string(),
+  "curriculum": zod.string(),
+  "sourceType": zod.enum(['textbook', 'offline', 'website', 'custom']),
+  "instructions": zod.string(),
+  "resourceUrl": zod.string().nullable(),
+  "schoolYear": zod.string(),
+  "rubric": zod.string(),
+  "startDate": zod.coerce.date(),
+  "count": zod.int().min(1).max(scheduleChildWorkBodyCountMax),
+  "weekdays": zod.array(zod.int().min(scheduleChildWorkBodyWeekdaysItemMin).max(scheduleChildWorkBodyWeekdaysItemMax)).min(1).max(scheduleChildWorkBodyWeekdaysMax),
+  "skipDates": zod.array(zod.coerce.date()).max(scheduleChildWorkBodySkipDatesMax).default(scheduleChildWorkBodySkipDatesDefault),
+  "requestId": zod.uuid()
+})
+
+export const ScheduleChildWorkResponse = zod.object({
+  "assignmentIds": zod.array(zod.string())
+})
+
+
+export const ExportYearPortfolioParams = zod.object({
+  "studentId": zod.coerce.string()
+})
+
+export const exportYearPortfolioQueryYearMax = 200;
+
+
+
+export const ExportYearPortfolioQueryParams = zod.object({
+  "year": zod.coerce.string().max(exportYearPortfolioQueryYearMax)
+})
+
+export const ExportYearPortfolioResponse = zod.record(zod.string(), zod.unknown())
+
+
+export const GetPrivateEvidenceParams = zod.object({
+  "studentId": zod.coerce.string(),
+  "assignmentId": zod.coerce.string(),
+  "submissionId": zod.coerce.string(),
+  "index": zod.coerce.string()
+})
+
+export const GetPrivateEvidenceResponse = zod.unknown()
+
+
+export const GetFamilySessionResponse = zod.object({
+  "mode": zod.string(),
+  "user": zod.record(zod.string(), zod.unknown()).nullable(),
+  "csrfToken": zod.string().nullable(),
+  "allowSignup": zod.boolean()
+})
+
+
+export const registerLocalFamilyBodyUsernameMin = 3;
+export const registerLocalFamilyBodyUsernameMax = 64;
+
+export const registerLocalFamilyBodyPasswordMin = 15;
+export const registerLocalFamilyBodyPasswordMax = 128;
+
+export const registerLocalFamilyBodyNameMax = 100;
+
+
+
+export const RegisterLocalFamilyBody = zod.object({
+  "username": zod.string().min(registerLocalFamilyBodyUsernameMin).max(registerLocalFamilyBodyUsernameMax),
+  "password": zod.string().min(registerLocalFamilyBodyPasswordMin).max(registerLocalFamilyBodyPasswordMax),
+  "name": zod.string().min(1).max(registerLocalFamilyBodyNameMax)
+})
+
+export const RegisterLocalFamilyResponse = zod.void()
+
+
+export const loginFamilyBodyUsernameMin = 3;
+export const loginFamilyBodyUsernameMax = 64;
+
+export const loginFamilyBodyPasswordMax = 128;
+
+
+
+export const LoginFamilyBody = zod.object({
+  "username": zod.string().min(loginFamilyBodyUsernameMin).max(loginFamilyBodyUsernameMax),
+  "password": zod.string().min(1).max(loginFamilyBodyPasswordMax)
+})
+
+export const LoginFamilyResponse = zod.unknown()
+
+
+export const LogoutFamilyResponse = zod.void()
+
+
+export const CreateChildLoginParams = zod.object({
+  "studentId": zod.coerce.string()
+})
+
+export const createChildLoginBodyUsernameMin = 3;
+export const createChildLoginBodyUsernameMax = 64;
+
+export const createChildLoginBodyPasswordMin = 15;
+export const createChildLoginBodyPasswordMax = 128;
+
+
+
+export const CreateChildLoginBody = zod.object({
+  "username": zod.string().min(createChildLoginBodyUsernameMin).max(createChildLoginBodyUsernameMax),
+  "password": zod.string().min(createChildLoginBodyPasswordMin).max(createChildLoginBodyPasswordMax)
+})
+
+export const CreateChildLoginResponse = zod.void()
+
+
+export const changeFamilyPasswordBodyCurrentPasswordMax = 128;
+
+export const changeFamilyPasswordBodyNewPasswordMin = 15;
+export const changeFamilyPasswordBodyNewPasswordMax = 128;
+
+
+
+export const ChangeFamilyPasswordBody = zod.object({
+  "currentPassword": zod.string().min(1).max(changeFamilyPasswordBodyCurrentPasswordMax),
+  "newPassword": zod.string().min(changeFamilyPasswordBodyNewPasswordMin).max(changeFamilyPasswordBodyNewPasswordMax)
+})
+
+export const ChangeFamilyPasswordResponse = zod.void()
+
+
+export const GetChildWorkParams = zod.object({
+  "studentId": zod.coerce.string()
+})
 
 export const getChildWorkResponseAssignmentsItemSubmissionsItemReviewsItemScoreMin = 0;
 export const getChildWorkResponseAssignmentsItemSubmissionsItemReviewsItemScoreMax = 100;
@@ -34,7 +176,7 @@ export const GetChildWorkResponse = zod.object({
   "resourceUrl": zod.string().nullable(),
   "dueDate": zod.coerce.date(),
   "schoolYear": zod.string(),
-  "rubric": zod.string(),
+  "rubric": zod.string().optional().describe('Returned to parent sessions only.'),
   "id": zod.string(),
   "studentId": zod.string(),
   "status": zod.enum(['assigned', 'submitted', 'needs_revision', 'approved']),
@@ -45,7 +187,7 @@ export const GetChildWorkResponse = zod.object({
   "notes": zod.string(),
   "evidence": zod.array(zod.object({
   "name": zod.string(),
-  "dataUrl": zod.string().max(getChildWorkResponseAssignmentsItemSubmissionsItemEvidenceItemDataUrlMax).describe('PNG\/JPEG base64 data URL, maximum decoded size 1 MiB. Synthetic fixtures only.')
+  "url": zod.string().describe('Authenticated same-origin evidence endpoint. No public URL.')
 })),
   "createdAt": zod.coerce.date(),
   "reviews": zod.array(zod.object({

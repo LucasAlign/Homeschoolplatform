@@ -241,11 +241,17 @@ export interface WorkSubmission {
   createdAt: string;
 }
 
+export interface WorkPrivateEvidence {
+  name: string;
+  /** Authenticated same-origin evidence endpoint. No public URL. */
+  url: string;
+}
+
 export interface WorkSubmissionWithReviews {
   id: string;
   assignmentId: string;
   notes: string;
-  evidence: WorkEvidence[];
+  evidence: WorkPrivateEvidence[];
   createdAt: string;
   reviews: WorkReview[];
 }
@@ -317,7 +323,8 @@ export interface WorkAssignmentWithHistory {
   resourceUrl: string | null;
   dueDate: string;
   schoolYear: string;
-  rubric: string;
+  /** Returned to parent sessions only. */
+  rubric?: string;
   id: string;
   studentId: string;
   status: WorkAssignmentWithHistoryStatus;
@@ -354,4 +361,127 @@ export interface ChildWork {
 export interface WorkError {
   error: string;
 }
+
+export type WorkScheduleInputSourceType = typeof WorkScheduleInputSourceType[keyof typeof WorkScheduleInputSourceType];
+
+
+export const WorkScheduleInputSourceType = {
+  textbook: 'textbook',
+  offline: 'offline',
+  website: 'website',
+  custom: 'custom',
+} as const;
+
+export interface WorkScheduleInput {
+  /** @maxLength 180 */
+  title: string;
+  subject: string;
+  curriculum: string;
+  sourceType: WorkScheduleInputSourceType;
+  instructions: string;
+  /** @nullable */
+  resourceUrl: string | null;
+  schoolYear: string;
+  rubric: string;
+  startDate: string;
+  /**
+     * @minimum 1
+     * @maximum 60
+     */
+  count: number;
+  /**
+     * @minItems 1
+     * @maxItems 7
+     * @items.minimum 0
+     * @items.maximum 6
+     */
+  weekdays: number[];
+  /** @maxItems 100 */
+  skipDates?: string[];
+  requestId: string;
+}
+
+export interface WorkScheduleResult {
+  assignmentIds: string[];
+}
+
+export type ExportYearPortfolioParams = {
+/**
+ * @maxLength 200
+ */
+year: string;
+};
+
+export type ExportYearPortfolio200 = { [key: string]: unknown };
+
+/**
+ * @nullable
+ */
+export type GetFamilySession200User = { [key: string]: unknown } | null;
+
+export type GetFamilySession200 = {
+  mode: string;
+  /** @nullable */
+  user: GetFamilySession200User;
+  /** @nullable */
+  csrfToken: string | null;
+  allowSignup: boolean;
+};
+
+export type RegisterLocalFamilyBody = {
+  /**
+     * @minLength 3
+     * @maxLength 64
+     */
+  username: string;
+  /**
+     * @minLength 15
+     * @maxLength 128
+     */
+  password: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  name: string;
+};
+
+export type LoginFamilyBody = {
+  /**
+     * @minLength 3
+     * @maxLength 64
+     */
+  username: string;
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
+  password: string;
+};
+
+export type CreateChildLoginBody = {
+  /**
+     * @minLength 3
+     * @maxLength 64
+     */
+  username: string;
+  /**
+     * @minLength 15
+     * @maxLength 128
+     */
+  password: string;
+};
+
+export type ChangeFamilyPasswordBody = {
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
+  currentPassword: string;
+  /**
+     * @minLength 15
+     * @maxLength 128
+     */
+  newPassword: string;
+};
 

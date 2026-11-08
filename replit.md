@@ -1,9 +1,10 @@
 # AnchorOne homeschool platform
 
-Curriculum authoring and child-scoped daily work, submissions, parent review, and year portfolios. The current branch permits local synthetic data only; real family authentication is a release blocker.
+Curriculum authoring, verified family/child sessions, daily work and recurring lessons, private submissions, parent review, and year portfolios. The current branch permits local synthetic data only; production release gates remain in place.
 
 - [Implementation phases and risks](docs/IMPLEMENTATION-PLAN.md)
 - [Local setup and verification](docs/LOCAL-DEVELOPMENT.md)
+- [Family sessions and release blockers](docs/AUTHORIZATION-DESIGN.md)
 
 ## Run & Operate
 

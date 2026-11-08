@@ -20,6 +20,24 @@ tags:
     description: Dashboard summary operations
 
 paths:
+  /students/{studentId}/work/schedule:
+    $ref: './work.openapi.json#/paths/~1students~1{studentId}~1work~1schedule'
+  /students/{studentId}/work/portfolio:
+    $ref: './work.openapi.json#/paths/~1students~1{studentId}~1work~1portfolio'
+  /students/{studentId}/work/{assignmentId}/submissions/{submissionId}/evidence/{index}:
+    $ref: './work.openapi.json#/paths/~1students~1{studentId}~1work~1{assignmentId}~1submissions~1{submissionId}~1evidence~1{index}'
+  /auth/session:
+    $ref: './auth.openapi.json#/paths/~1auth~1session'
+  /auth/register:
+    $ref: './auth.openapi.json#/paths/~1auth~1register'
+  /auth/login:
+    $ref: './auth.openapi.json#/paths/~1auth~1login'
+  /auth/logout:
+    $ref: './auth.openapi.json#/paths/~1auth~1logout'
+  /auth/children/{studentId}:
+    $ref: './auth.openapi.json#/paths/~1auth~1children~1{studentId}'
+  /auth/password:
+    $ref: './auth.openapi.json#/paths/~1auth~1password'
   /students/{studentId}/work:
     $ref: './work.openapi.json#/paths/~1students~1{studentId}~1work'
   /students/{studentId}/work/{assignmentId}/submissions:

@@ -1,0 +1,288 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Family sessions",
+    "version": "0.2.0"
+  },
+  "paths": {
+    "/auth/session": {
+      "get": {
+        "operationId": "getFamilySession",
+        "responses": {
+          "200": {
+            "description": "Current server-verified principal; mode and signup availability; CSRF token for an authenticated session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "type": ["object", "null"],
+                      "additionalProperties": true
+                    },
+                    "csrfToken": {
+                      "type": ["string", "null"]
+                    },
+                    "allowSignup": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["mode", "user", "csrfToken", "allowSignup"]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "registerLocalFamily",
+        "tags": ["auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password", "name"],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 64
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 15,
+                    "maxLength": 128
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "401": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "403": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "409": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "429": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "503": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "loginFamily",
+        "tags": ["auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 64
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "401": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "403": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "409": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "429": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "503": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "logoutFamily",
+        "responses": {
+          "204": {
+            "description": "Session revoked and cookie cleared"
+          },
+          "401": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "403": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          }
+        }
+      }
+    },
+    "/auth/children/{studentId}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "createChildLogin",
+        "tags": ["auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 64
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 15,
+                    "maxLength": 128
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "401": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "403": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "409": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "429": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "503": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          }
+        }
+      }
+    },
+    "/auth/password": {
+      "post": {
+        "operationId": "changeFamilyPassword",
+        "tags": ["auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["currentPassword", "newPassword"],
+                "properties": {
+                  "currentPassword": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 15,
+                    "maxLength": 128
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "401": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "403": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "409": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "429": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "503": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          }
+        }
+      }
+    }
+  }
+}

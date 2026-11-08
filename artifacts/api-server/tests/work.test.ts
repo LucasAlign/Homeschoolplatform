@@ -9,10 +9,15 @@ import type { Server } from "node:http";
 import { request as httpRequest } from "node:http";
 import { syntheticConfiguration } from "../src/lib/access";
 import { assignmentInput, submissionInput } from "../src/lib/work-validation";
+import { familyCases } from "./family-cases";
+import { planSchedule, scheduleInput } from "../src/lib/schedule";
 
 let server: Server;
 let base: string;
 let fixture: import("@electric-sql/pglite").PGlite;
+test("verified family sessions enforce parent/child permissions, private evidence and session lifecycle", async () => {
+  await familyCases(base, fixture);
+});
 const sample = {
   title: "Count garden seeds",
   subject: "Math",
@@ -26,6 +31,35 @@ const sample = {
 };
 const png =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=";
+test("calendar schedules handle leap days and reject invalid or unbounded requests", () => {
+  const { dueDate: _dueDate, ...assignment } = sample;
+  const input = {
+    ...assignment,
+    startDate: "2028-02-28",
+    count: 3,
+    weekdays: [0, 1, 2, 3, 4, 5, 6],
+    skipDates: [],
+    requestId: "38a60686-310f-45c8-9458-d2c3ca276ceb",
+  };
+  assert.deepEqual(
+    planSchedule(scheduleInput.parse(input)).map((a) => a.dueDate),
+    ["2028-02-28", "2028-02-29", "2028-03-01"],
+  );
+  for (const change of [
+    { count: 61 },
+    { count: 0 },
+    { weekdays: [] },
+    { weekdays: [1, 1] },
+    { startDate: "2027-02-29" },
+  ])
+    assert.equal(
+      scheduleInput.safeParse({ ...input, ...change }).success,
+      false,
+    );
+  assert.throws(() =>
+    planSchedule(scheduleInput.parse({ ...input, startDate: "9999-12-31" })),
+  );
+});
 async function request(
   path: string,
   body?: unknown,
@@ -38,10 +72,11 @@ async function request(
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const data = response.status === 204 ? null : await response.json();
-  return { status: response.status, data };
+  return { status: response.status, data, headers: response.headers };
 }
 before(async () => {
   process.env.NODE_ENV = "test";
+  process.env.AUTH_MODE = "synthetic";
   process.env.SYNTHETIC_DATA_ONLY = "true";
   // Placeholder only. @workspace/db is replaced with a fresh in-memory PostgreSQL fixture.
   process.env.DATABASE_URL =
@@ -113,6 +148,12 @@ test("configuration rejects production, remote DB, missing opt-in, and database 
     assert.equal(syntheticConfiguration({ ...env, ...change }), false);
 });
 test("HTTP boundary rejects unconfigured access and cross-origin requests", async () => {
+  process.env.AUTH_MODE = "unknown";
+  try {
+    assert.equal((await request("/students")).status, 503);
+  } finally {
+    process.env.AUTH_MODE = "synthetic";
+  }
   process.env.NODE_ENV = "production";
   try {
     assert.equal((await request("/students")).status, 503);
@@ -271,7 +312,7 @@ test("complete child-scoped assignment, revision, parent override and portfolio 
     ).status,
     201,
   );
-  const portfolio = (await request(path)).data;
+  const portfolio = (await request(path + "/portfolio?year=2026-27")).data;
   assert.equal(portfolio.assignments[0].status, "approved");
   assert.equal(portfolio.assignments[0].submissions.length, 2);
   assert.equal(

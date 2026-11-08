@@ -19,7 +19,8 @@ export interface WorkAssignmentWithHistory {
   resourceUrl: string | null;
   dueDate: Date;
   schoolYear: string;
-  rubric: string;
+  /** Returned to parent sessions only. */
+  rubric?: string;
   id: string;
   studentId: string;
   status: WorkAssignmentWithHistoryStatus;

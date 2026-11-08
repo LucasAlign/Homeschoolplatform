@@ -3,22 +3,27 @@ import { db } from "@workspace/db";
 import { lessonsTable, unitsTable, coursesTable } from "@workspace/db";
 import { eq, and, count } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { DEMO_USER_ID, ensureDemoUser } from "../lib/user";
+import { principal } from "../lib/session";
 import { ownsLesson, ownsUnit } from "../lib/ownership";
 
 const router = Router();
 router.use("/lessons/:lessonId", async (req, res, next) => {
-  if (!await ownsLesson(req.params.lessonId)) { res.status(404).json({ error: "Lesson not found" }); return; }
+  if (!(await ownsLesson(req.params.lessonId, principal(res).ownerId))) {
+    res.status(404).json({ error: "Lesson not found" });
+    return;
+  }
   next();
 });
 router.use("/units/:unitId/lessons", async (req, res, next) => {
-  if (!await ownsUnit(req.params.unitId)) { res.status(404).json({ error: "Unit not found" }); return; }
+  if (!(await ownsUnit(req.params.unitId, principal(res).ownerId))) {
+    res.status(404).json({ error: "Unit not found" });
+    return;
+  }
   next();
 });
 
 // Create lesson for a unit
 router.post("/units/:unitId/lessons", async (req, res): Promise<void> => {
-  await ensureDemoUser();
   const { unitId } = req.params;
   const { title } = req.body;
 
@@ -52,7 +57,6 @@ router.post("/units/:unitId/lessons", async (req, res): Promise<void> => {
 
 // Get lesson detail
 router.get("/lessons/:lessonId", async (req, res): Promise<void> => {
-  await ensureDemoUser();
   const { lessonId } = req.params;
 
   const [lesson] = await db
@@ -65,7 +69,10 @@ router.get("/lessons/:lessonId", async (req, res): Promise<void> => {
     return;
   }
 
-  const [unit] = await db.select().from(unitsTable).where(eq(unitsTable.id, lesson.unitId));
+  const [unit] = await db
+    .select()
+    .from(unitsTable)
+    .where(eq(unitsTable.id, lesson.unitId));
   if (!unit) {
     res.status(404).json({ error: "Unit not found" });
     return;
@@ -74,7 +81,12 @@ router.get("/lessons/:lessonId", async (req, res): Promise<void> => {
   const [course] = await db
     .select()
     .from(coursesTable)
-    .where(and(eq(coursesTable.id, unit.courseId), eq(coursesTable.ownerId, DEMO_USER_ID)));
+    .where(
+      and(
+        eq(coursesTable.id, unit.courseId),
+        eq(coursesTable.ownerId, principal(res).ownerId),
+      ),
+    );
 
   if (!course) {
     res.status(404).json({ error: "Course not found" });
@@ -93,7 +105,6 @@ router.get("/lessons/:lessonId", async (req, res): Promise<void> => {
 
 // Update lesson
 router.patch("/lessons/:lessonId", async (req, res): Promise<void> => {
-  await ensureDemoUser();
   const { lessonId } = req.params;
   const { title, content, published } = req.body;
 
@@ -111,7 +122,9 @@ router.patch("/lessons/:lessonId", async (req, res): Promise<void> => {
     .update(lessonsTable)
     .set({
       ...(title !== undefined ? { title: String(title).trim() } : {}),
-      ...(content !== undefined ? { content: content == null ? "" : String(content) } : {}),
+      ...(content !== undefined
+        ? { content: content == null ? "" : String(content) }
+        : {}),
       ...(published !== undefined ? { published: Boolean(published) } : {}),
       updatedAt: new Date(),
     })
@@ -127,7 +140,6 @@ router.patch("/lessons/:lessonId", async (req, res): Promise<void> => {
 
 // Delete lesson
 router.delete("/lessons/:lessonId", async (req, res): Promise<void> => {
-  await ensureDemoUser();
   const { lessonId } = req.params;
 
   await db.delete(lessonsTable).where(eq(lessonsTable.id, lessonId));

@@ -1,5 +1,7 @@
 # AnchorOne: child work foundation
 
+Current continuation: verified family/child sessions, authenticated evidence retrieval and retry-safe recurring lessons are implemented for local synthetic use. See [authorization design and release blockers](AUTHORIZATION-DESIGN.md). The phase-1 snapshot below records the previous commit's scope; it must not be read as the current authentication implementation.
+
 ## Baseline inspected
 
 Work starts at `164a964e22255f4ca1a2d91e5d5b515ad8a2fbfb` (main). The active app is React/Vite in `artifacts/homeschool`, Express in `artifacts/api-server`, Drizzle/PostgreSQL in `lib/db`, and Orval contracts in `lib/api-spec`. `.migration-backup` is historical Next.js code, not the active implementation. No applicable AGENTS.md exists outside that backup. The referenced pnpm-workspace skill was not present locally; replit.md supplied the workspace commands.
@@ -8,7 +10,7 @@ The existing app creates students and parent-owned courses/units/lessons. Curric
 
 The separate existing checkout at `C:/Users/LucasSystemMobile/homeschool platform/Homeschoolplatform` is on `firebase-mvp-foundation` with unrelated edits. It was left untouched. This isolated checkout uses `codex/child-work-foundation`. No push, merge, deployment, live DB, account settings, or external AI calls are part of this work.
 
-## Phase 1 implemented
+## Phase 1 snapshot (commit 1682ae6)
 
 - All data routes fail closed with 503 until explicitly configured for local synthetic data. Production mode remains blocked. The health route alone stays public. API and Vite bind to loopback; Vite proxies `/api` locally. Requests reject foreign Host/Origin, cross-site browser requests, non-loopback peers, remote database URLs, and database URL query overrides.
 - This is **not family authentication**. There is no trusted demo-user header, provider selection, real child login, or parent/student role enforcement. `demo-parent` exists only behind the synthetic boundary. All UI pages disclose this limitation. Never enable this mode on an existing family database, reverse proxy, tunnel, or public host.
@@ -26,8 +28,8 @@ The separate existing checkout at `C:/Users/LucasSystemMobile/homeschool platfor
 4. **Grounded AI drafts:** configure provider and explicit data-sharing consent; keep secrets server-side; use selected rubric/answer key and reviewed evidence; treat text in uploads as untrusted; return draft feedback with grounding, uncertainty and unavailable/failure states; require parent acceptance/override. Test with synthetic fixtures before considering real data. Never automatically finalize grades.
 5. **Year-end compilation:** printable/downloadable PDF/ZIP, selected academic-date ranges, subject summaries, grade policies, export integrity checks and restore/import. Confirm regional recordkeeping needs rather than claiming compliance.
 
-## Remaining implementation limitations
+## Remaining implementation limitations after the continuation
 
-No production-ready authentication or private upload service exists. The application is intentionally unavailable for real families. Parent review and answer keys share a parent-operated development screen; choosing a child is not a child session. Existing curriculum onboarding still makes generic draft courses; daily assignments record their curriculum independently. Assignment editing, deleting child work, bulk operations, pagination, persistent export jobs, and AI grading are deferred.
+Verified parent/child credentials and server-enforced role boundaries now exist, including child-specific UI and private evidence retrieval. Production remains intentionally blocked pending the release steps in AUTHORIZATION-DESIGN.md. Existing curriculum onboarding still makes generic draft courses; daily assignments record their curriculum independently. Recurring creation is implemented, but enrollment links, assignment editing/rescheduling, deleting child work, pagination, persistent export jobs, and AI grading remain deferred.
 
 The generated initial migration creates the entire schema for a **fresh empty synthetic database**. Do not apply it blindly to an existing database that was initialized using `drizzle-kit push`. A separately reviewed baseline/adoption migration is needed before any existing deployment is upgraded. Tests use an isolated in-memory PostgreSQL-compatible PGlite engine and do not prove node-postgres networking, multi-process locking, or backup behavior on a live PostgreSQL server.

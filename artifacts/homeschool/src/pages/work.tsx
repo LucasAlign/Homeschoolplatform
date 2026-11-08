@@ -1,5 +1,6 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, useRef, type FormEvent } from "react";
 import { Link } from "wouter";
+import { useSession } from "@/components/session-provider";
 import type {
   ChildWork as Work,
   WorkAssignmentWithHistory as Assignment,
@@ -31,6 +32,8 @@ async function api<T>(path: string, body?: unknown): Promise<T> {
 }
 
 export default function WorkPage() {
+  const { parent, mode } = useSession();
+  const scheduleRequest = useRef(crypto.randomUUID());
   const [students, setStudents] = useState<Student[]>([]);
   const [studentId, setStudentId] = useState("");
   const [work, setWork] = useState<Work | null>(null);
@@ -79,7 +82,35 @@ export default function WorkPage() {
   async function create(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    const values = Object.fromEntries(new FormData(form));
+    const formData = new FormData(form);
+    const values = Object.fromEntries(formData);
+    const count = Number(values.repeatCount);
+    const skipDates = String(values.skipDates || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    delete values.repeatCount;
+    delete values.skipDates;
+    delete values.weekdays;
+    if (count > 1) {
+      const dueDate = values.dueDate;
+      delete values.dueDate;
+      if (
+        await save(`/students/${studentId}/work/schedule`, {
+          ...values,
+          resourceUrl: values.resourceUrl || null,
+          startDate: dueDate,
+          count,
+          weekdays: formData.getAll("weekdays").map(Number),
+          skipDates,
+          requestId: scheduleRequest.current,
+        })
+      ) {
+        form.reset();
+        scheduleRequest.current = crypto.randomUUID();
+      }
+      return;
+    }
     if (
       await save(`/students/${studentId}/work`, {
         ...values,
@@ -88,32 +119,28 @@ export default function WorkPage() {
     )
       form.reset();
   }
-  function exportPortfolio() {
+  async function exportPortfolio() {
     if (!work || !year) return;
-    const selected = work.assignments.filter((a) => a.schoolYear === year);
-    const file = new Blob(
-      [
-        JSON.stringify(
-          {
-            version: 1,
-            exportedAt: new Date().toISOString(),
-            schoolYear: year,
-            student: work.student,
-            assignments: selected,
-            ai: work.ai,
-          },
-          null,
-          2,
-        ),
-      ],
-      { type: "application/json" },
-    );
-    const url = URL.createObjectURL(file);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `portfolio-${studentId}-${year.replace(/[^a-zA-Z0-9-]/g, "_")}.json`;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setBusy(true);
+    setError("");
+    try {
+      const portfolio = await api(
+        `/students/${studentId}/work/portfolio?year=${encodeURIComponent(year)}`,
+      );
+      const file = new Blob([JSON.stringify(portfolio, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(file);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `portfolio-${studentId}-${year.replace(/[^a-zA-Z0-9-]/g, "_")}.json`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
   }
   const shown =
     work?.assignments.filter(
@@ -132,7 +159,7 @@ export default function WorkPage() {
         className="p-4 bg-amber-50 border border-amber-300 rounded"
       >
         Local synthetic-data workspace. Use fictional children and sample images
-        only. Family sign-in and real student data are not enabled.
+        only. Production access and real student data are not enabled.
       </p>
       {error && (
         <p role="alert" className="p-4 border border-red-500 text-red-800">
@@ -159,9 +186,11 @@ export default function WorkPage() {
             ))}
           </select>
         </label>
-        <Link className={button} href="/students/new">
-          Add fictional learner
-        </Link>
+        {parent && (
+          <Link className={button} href="/students/new">
+            Add fictional learner
+          </Link>
+        )}
       </div>
       {!students.length && !error && <p>Add a fictional learner to begin.</p>}
       {studentId && !work && !error && (
@@ -169,79 +198,190 @@ export default function WorkPage() {
       )}
       {work && (
         <>
-          <details className="border rounded p-4">
-            <summary className="font-semibold cursor-pointer">
-              Plan an assignment
-            </summary>
-            <form onSubmit={create} className="grid md:grid-cols-2 gap-4 mt-4">
-              {[
-                ["title", "Assignment title"],
-                ["subject", "Subject"],
-                ["curriculum", "Curriculum or book"],
-                ["schoolYear", "School year"],
-              ].map(([name, label]) => (
-                <label key={name}>
-                  {label}
-                  <input
-                    name={name}
-                    required
-                    maxLength={200}
+          {parent && (
+            <details className="border rounded p-4">
+              <summary className="font-semibold cursor-pointer">
+                Plan an assignment
+              </summary>
+              <form
+                onSubmit={create}
+                onChange={() => {
+                  scheduleRequest.current = crypto.randomUUID();
+                }}
+                className="grid md:grid-cols-2 gap-4 mt-4"
+              >
+                {[
+                  ["title", "Assignment title"],
+                  ["subject", "Subject"],
+                  ["curriculum", "Curriculum or book"],
+                  ["schoolYear", "School year"],
+                ].map(([name, label]) => (
+                  <label key={name}>
+                    {label}
+                    <input
+                      name={name}
+                      required
+                      maxLength={200}
+                      className={field}
+                      placeholder={
+                        name === "schoolYear" ? "2026-27" : undefined
+                      }
+                    />
+                  </label>
+                ))}
+                <label>
+                  Source
+                  <select
+                    aria-label="Source"
+                    name="sourceType"
                     className={field}
-                    placeholder={name === "schoolYear" ? "2026-27" : undefined}
+                  >
+                    {["textbook", "offline", "website", "custom"].map((s) => (
+                      <option key={s}>{s}</option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Due date
+                  <input
+                    type="date"
+                    name="dueDate"
+                    defaultValue={today()}
+                    required
+                    className={field}
                   />
                 </label>
-              ))}
-              <label>
-                Source
-                <select aria-label="Source" name="sourceType" className={field}>
-                  {["textbook", "offline", "website", "custom"].map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Due date
-                <input
-                  type="date"
-                  name="dueDate"
-                  defaultValue={today()}
-                  required
-                  className={field}
-                />
-              </label>
-              <label className="md:col-span-2">
-                Website link (optional)
-                <input
-                  type="url"
-                  name="resourceUrl"
-                  placeholder="https://"
-                  maxLength={2000}
-                  className={field}
-                />
-              </label>
-              <label>
-                Instructions / pages / activity
-                <textarea
-                  name="instructions"
-                  required
-                  maxLength={10000}
-                  className={field}
-                />
-              </label>
-              <label>
-                Rubric or answer key for parent review
-                <textarea
-                  name="rubric"
-                  required
-                  maxLength={10000}
-                  className={field}
-                />
-              </label>
-              <button disabled={busy} className={button}>
-                Save assignment
-              </button>
-            </form>
-          </details>
+                <label className="md:col-span-2">
+                  Website link (optional)
+                  <input
+                    type="url"
+                    name="resourceUrl"
+                    placeholder="https://"
+                    maxLength={2000}
+                    className={field}
+                  />
+                </label>
+                <label>
+                  Instructions / pages / activity
+                  <textarea
+                    name="instructions"
+                    required
+                    maxLength={10000}
+                    className={field}
+                  />
+                </label>
+                <label>
+                  Rubric or answer key for parent review
+                  <textarea
+                    name="rubric"
+                    required
+                    maxLength={10000}
+                    className={field}
+                  />
+                </label>
+                <label>
+                  Number of lessons
+                  <input
+                    name="repeatCount"
+                    type="number"
+                    min={1}
+                    max={60}
+                    defaultValue={1}
+                    required
+                    className={field}
+                  />
+                </label>
+                <fieldset>
+                  <legend>Learning weekdays (for repeated lessons)</legend>
+                  <div className="flex flex-wrap gap-3">
+                    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                      (day, i) => (
+                        <label key={day}>
+                          <input
+                            type="checkbox"
+                            name="weekdays"
+                            value={i}
+                            defaultChecked={i > 0 && i < 6}
+                          />{" "}
+                          {day}
+                        </label>
+                      ),
+                    )}
+                  </div>
+                </fieldset>
+                <label className="md:col-span-2">
+                  Dates to skip (YYYY-MM-DD, comma separated)
+                  <input
+                    name="skipDates"
+                    className={field}
+                    placeholder="2026-12-25, 2027-01-01"
+                  />
+                </label>
+                <p className="text-sm md:col-span-2">
+                  Repeated lessons share these instructions and rubric. Each
+                  gets its own due date and submission history.
+                </p>
+                <button disabled={busy} className={button}>
+                  Save assignment
+                </button>
+              </form>
+            </details>
+          )}
+          {parent && mode === "family" && (
+            <details className="border rounded p-4">
+              <summary>Create this child's login</summary>
+              <form
+                className="space-y-3 mt-4"
+                onSubmit={async (event) => {
+                  event.preventDefault();
+                  const form = event.currentTarget;
+                  setBusy(true);
+                  setError("");
+                  try {
+                    await api(
+                      `/auth/children/${studentId}`,
+                      Object.fromEntries(new FormData(form)),
+                    );
+                    form.reset();
+                    setError(
+                      "Child login created. Sign out to use the child account.",
+                    );
+                  } catch (e) {
+                    setError((e as Error).message);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                <label className="block">
+                  Child username
+                  <input
+                    className={field}
+                    name="username"
+                    required
+                    minLength={3}
+                    maxLength={64}
+                    autoComplete="off"
+                  />
+                </label>
+                <label className="block">
+                  Child password (15+ characters)
+                  <input
+                    className={field}
+                    name="password"
+                    type="password"
+                    required
+                    minLength={15}
+                    maxLength={128}
+                    autoComplete="new-password"
+                  />
+                </label>
+                <button className={button} disabled={busy}>
+                  Create child login
+                </button>
+              </form>
+            </details>
+          )}
           <p className="text-sm text-gray-600">
             AI grading unavailable: {work.ai.reason}
           </p>
@@ -259,34 +399,41 @@ export default function WorkPage() {
                 <option value="all">All work and portfolio</option>
               </select>
             </label>
-            <label>
-              Portfolio school year
-              <select
-                aria-label="Portfolio school year"
-                className={field}
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-              >
-                <option value="">Choose year</option>
-                {[...new Set(work.assignments.map((a) => a.schoolYear))]
-                  .sort()
-                  .map((y) => (
-                    <option key={y}>{y}</option>
-                  ))}
-              </select>
-            </label>
-            <button
-              className={button}
-              disabled={!year || busy}
-              onClick={exportPortfolio}
-            >
-              Download year portfolio
-            </button>
+            {parent && (
+              <>
+                <label>
+                  Portfolio school year
+                  <select
+                    aria-label="Portfolio school year"
+                    className={field}
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                  >
+                    <option value="">Choose year</option>
+                    {[...new Set(work.assignments.map((a) => a.schoolYear))]
+                      .sort()
+                      .map((y) => (
+                        <option key={y}>{y}</option>
+                      ))}
+                  </select>
+                </label>
+                <button
+                  className={button}
+                  disabled={!year || busy}
+                  onClick={exportPortfolio}
+                >
+                  Download year portfolio
+                </button>
+              </>
+            )}
           </div>
-          <p className="text-sm">
-            The portfolio includes every assignment, image, submission attempt,
-            and parent review for the selected year, including unfinished work.
-          </p>
+          {parent && (
+            <p className="text-sm">
+              The portfolio includes every assignment, image, submission
+              attempt, and parent review for the selected year, including
+              unfinished work.
+            </p>
+          )}
           {!shown.length && (
             <p className="border rounded p-6">No assignments in this view.</p>
           )}
@@ -319,6 +466,7 @@ function AssignmentCard({
   save: (path: string, body: unknown) => Promise<boolean>;
   setReadingBusy: (value: boolean) => void;
 }) {
+  const { parent } = useSession();
   const [fileError, setFileError] = useState("");
   const [reading, setReading] = useState(false);
   const latest = a.submissions.at(-1);
@@ -411,10 +559,12 @@ function AssignmentCard({
           Open learning resource
         </a>
       )}
-      <details>
-        <summary>Rubric / answer key (parent workspace)</summary>
-        <p className="whitespace-pre-wrap mt-2">{a.rubric}</p>
-      </details>
+      {parent && (
+        <details>
+          <summary>Rubric / answer key (parent workspace)</summary>
+          <p className="whitespace-pre-wrap mt-2">{a.rubric}</p>
+        </details>
+      )}
       {a.submissions.map((s, i) => (
         <div key={s.id} className="border-t pt-3 space-y-2">
           <h3 className="font-semibold">
@@ -424,11 +574,7 @@ function AssignmentCard({
           <div className="flex flex-wrap gap-4">
             {s.evidence.map((e, j) => (
               <figure key={j}>
-                <img
-                  src={e.dataUrl}
-                  alt={e.name}
-                  className="max-h-60 max-w-full"
-                />
+                <img src={e.url} alt={e.name} className="max-h-60 max-w-full" />
                 <figcaption className="text-sm">{e.name}</figcaption>
               </figure>
             ))}
@@ -464,7 +610,7 @@ function AssignmentCard({
           </button>
         </form>
       )}
-      {latest && (
+      {parent && latest && (
         <details>
           <summary className="cursor-pointer font-semibold">
             Parent review / override

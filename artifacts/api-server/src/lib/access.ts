@@ -19,12 +19,10 @@ export function syntheticConfiguration(env: NodeJS.ProcessEnv): boolean {
 
 export const requireLocalSynthetic: RequestHandler = (req, res, next) => {
   if (!syntheticConfiguration(process.env)) {
-    res
-      .status(503)
-      .json({
-        error:
-          "Family authentication is not configured. Real student data is disabled.",
-      });
+    res.status(503).json({
+      error:
+        "Production access is disabled. Configure an isolated local synthetic-data environment to continue.",
+    });
     return;
   }
   const remote = req.socket.remoteAddress;

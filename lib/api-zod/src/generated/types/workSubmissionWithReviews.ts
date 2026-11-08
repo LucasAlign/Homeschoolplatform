@@ -5,14 +5,14 @@
  * Homeschool Platform API
  * OpenAPI spec version: 0.1.0
  */
-import type { WorkEvidence } from './workEvidence';
+import type { WorkPrivateEvidence } from './workPrivateEvidence';
 import type { WorkReview } from './workReview';
 
 export interface WorkSubmissionWithReviews {
   id: string;
   assignmentId: string;
   notes: string;
-  evidence: WorkEvidence[];
+  evidence: WorkPrivateEvidence[];
   createdAt: Date;
   reviews: WorkReview[];
 }

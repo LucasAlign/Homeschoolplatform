@@ -8,6 +8,20 @@
       "when": 1794143687699,
       "tag": "0000_redundant_nekra",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794145670994,
+      "tag": "0001_daily_jack_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794146214074,
+      "tag": "0002_shiny_sauron",
+      "breakpoints": true
     }
   ]
 }

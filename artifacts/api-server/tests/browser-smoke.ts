@@ -7,6 +7,7 @@ import { createRequire } from "node:module";
 import { chromium, expect } from "@playwright/test";
 
 process.env.NODE_ENV = "test";
+process.env.AUTH_MODE = "synthetic";
 process.env.SYNTHETIC_DATA_ONLY = "true";
 process.env.DATABASE_URL =
   "postgresql://synthetic:synthetic@127.0.0.1:5432/homeschool_synthetic";
@@ -103,16 +104,14 @@ try {
   await page
     .getByLabel("Notes", { exact: true })
     .fill("Two plus three equals five.");
-  await page
-    .locator("input[type=file]")
-    .setInputFiles({
-      name: "synthetic.png",
-      mimeType: "image/png",
-      buffer: Buffer.from(
-        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
-        "base64",
-      ),
-    });
+  await page.locator("input[type=file]").setInputFiles({
+    name: "synthetic.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  });
   await page.getByRole("button", { name: "Submit for parent review" }).click();
   await expect(
     page.getByRole("heading", { name: "Garden seed arithmetic" }),

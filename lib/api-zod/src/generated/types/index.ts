@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './changeFamilyPasswordBody';
 export * from './childWork';
 export * from './childWorkAi';
 export * from './childWorkAiStatus';
@@ -15,14 +16,21 @@ export * from './courseDetail';
 export * from './courseInput';
 export * from './courseUpdate';
 export * from './courseWithCounts';
+export * from './createChildLoginBody';
 export * from './dashboardSummary';
 export * from './errorResponse';
+export * from './exportYearPortfolio200';
+export * from './exportYearPortfolioParams';
+export * from './getFamilySession200';
+export * from './getFamilySession200User';
 export * from './healthStatus';
 export * from './lesson';
 export * from './lessonDetail';
 export * from './lessonInput';
 export * from './lessonUpdate';
+export * from './loginFamilyBody';
 export * from './publishToggle';
+export * from './registerLocalFamilyBody';
 export * from './unit';
 export * from './unitInput';
 export * from './unitWithLessons';
@@ -36,10 +44,14 @@ export * from './workAssignmentWithHistorySourceType';
 export * from './workAssignmentWithHistoryStatus';
 export * from './workError';
 export * from './workEvidence';
+export * from './workPrivateEvidence';
 export * from './workReview';
 export * from './workReviewDecision';
 export * from './workReviewInput';
 export * from './workReviewInputDecision';
+export * from './workScheduleInput';
+export * from './workScheduleInputSourceType';
+export * from './workScheduleResult';
 export * from './workSubmission';
 export * from './workSubmissionInput';
 export * from './workSubmissionWithReviews';

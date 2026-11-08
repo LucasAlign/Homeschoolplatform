@@ -8,6 +8,7 @@ pnpm --filter @workspace/api-spec run codegen
 pnpm run typecheck
 pnpm test
 pnpm --filter @workspace/api-server exec tsx tests/browser-smoke.ts
+pnpm --filter @workspace/api-server exec tsx tests/browser-family.ts
 ```
 
 The browser smoke command runs **after `pnpm test`**. It launches the real API with an ephemeral PGlite adapter, Vite on a loopback-only random port, and headless Edge. It creates fictional learners, creates an assignment through the UI, uploads a synthetic PNG, approves work, verifies a downloaded portfolio, switches children, and checks mobile overflow. It closes its servers/browser and discards the database. Set `BROWSER_CHANNEL=chrome` for installed Chrome. Screenshots are in `artifacts/api-server/.test-build/`; this directory is ignored. No external requests are allowed by the browser harness.
@@ -31,13 +32,18 @@ Create ignored `artifacts/api-server/.env.local`:
 ```dotenv
 NODE_ENV=development
 SYNTHETIC_DATA_ONLY=true
+AUTH_MODE=family
+LOCAL_FAMILY_SIGNUP=true
+LOCAL_APP_ORIGIN=http://127.0.0.1:3000
 DATABASE_URL=postgresql://<local-user>:<local-password>@127.0.0.1:5432/homeschool_synthetic
 PORT=5000
 ```
 
-Run `pnpm --filter @workspace/api-server run dev` and, in another terminal with PORT unset or set to 3000, `pnpm --filter @workspace/homeschool run dev`. Open `http://127.0.0.1:3000/work`. The API dev script loads its `.env.local` cross-platform; never commit credentials. The production start command does not enable synthetic mode automatically. Missing authentication returns a truthful unavailable message.
+Run `pnpm --filter @workspace/api-server run dev` and, in another terminal with PORT unset or set to 3000, `pnpm --filter @workspace/homeschool run dev`. Open the exact configured `http://127.0.0.1:3000/work` origin. Create a fictional family account, sign in, add fictional children and create their logins from Daily Work. Parents can schedule repeated lessons, children can submit their own work, and parents can review and export. Use passwords of at least 15 characters. The API dev script loads its `.env.local` cross-platform; never commit credentials. Set `LOCAL_FAMILY_SIGNUP=false` after creating local fixture families if desired. `AUTH_MODE=synthetic` is the explicit old demo mode; missing or unknown modes fail closed. Both modes still require the synthetic database gate. The production start command does not enable either mode automatically.
 
-## Verification record (2026-11-08)
+`browser-family.ts` exercises real signup/login cookies, child credentials, recurring lessons, role-filtered UI, child submission, parent review, password change and cross-tab clearing against a fresh ephemeral database. It sets an exact random local frontend origin for the test only. See [authorization design](AUTHORIZATION-DESIGN.md) for the production blockers and limitations.
+
+## Phase-1 verification record (2026-11-08, commit 1682ae6)
 
 Original main was independently checked in a detached `../baseline` worktree. Locked dependency installation reached the Unix-only preinstall command and failed on Windows (`sh` unavailable). Installing baseline dependencies with lifecycle scripts skipped allowed its full typecheck to pass. Its build failed on the excluded `@rollup/rollup-win32-x64-msvc` package. No baseline automated test suite was configured for the active app.
 
@@ -52,3 +58,16 @@ Final verification passed:
 - `git diff --check`.
 
 Not run: real PostgreSQL/network-driver integration (Docker daemon unavailable), real-family login/authorization (not implemented), external AI calls (intentionally disabled), production migration, deployment, push, or merge. PGlite tests apply the checked-in migration to a fresh ephemeral database. These checks do not authorize production use.
+
+## Continuation verification (2026-11-08)
+
+Verified local credential authentication and family/child authorization are now implemented. Final checks on this continuation:
+
+- OpenAPI/Orval code generation and generated-library typecheck passed, including auth, private evidence, portfolio and recurring schedule contracts.
+- `pnpm test`: **7 passed, 0 failed**. The expanded family case exercises two parents in separate families, a child account, every legacy ownership chain, hidden answer keys/support notes, blocked child review/export/account creation, CSRF, spoofed identity headers, hostile login origin, password hashing, cookie flags, hashed session storage, rotation, logout, absolute/idle expiry, password revocation, throttling, authenticated image access and denial after logout. Scheduling checks cover weekday/holiday dates, identical retry IDs, conflicting retries, invalid limits and leap-day/calendar bounds. Prior evidence/review/revision tests still pass.
+- `browser-smoke.ts` passed: assignment, PNG upload/render, parent review, actual portfolio download/content verification, child selector isolation and desktop/mobile layout.
+- `browser-family.ts` passed: UI family registration and cookie login, child credential creation, three recurring lessons, child-specific UI without parent controls/answer keys, child submission, parent approval, logout/account switching, password change and cross-tab clearing, mobile overflow check, no page exceptions. The family-child screenshot was visually inspected.
+- Full workspace typecheck and build passed with `PORT=3000` and `BASE_PATH=/`; the existing non-fatal tooltip sourcemap diagnostic remains.
+- `git diff --check` passed.
+
+Not run: network PostgreSQL/multi-process validation, production identity/recovery setup, private object-storage operations, external AI calls, production migrations or deployment. No real child data, provider account or live settings were used. Browser servers and ephemeral databases were closed after tests. See AUTHORIZATION-DESIGN.md for the precise remaining release gates.
