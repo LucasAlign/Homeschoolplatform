@@ -1,5 +1,15 @@
 # Local synthetic development
 
+## Portfolio/grading continuation verification (2026-11-08)
+
+- `pnpm test`: 11 passed, 0 failed. New coverage includes parent-only portfolio/draft access, foreign-family and wrong-year selection denial, private-field exclusion, selection bounds, optional evidence/review history, unchanged assignment status after generation, accepted-vs-overridden reviews, stale submissions/rubrics, disabled providers, image-only unavailability, grounded citations, invalid output and timeout handling.
+- Full workspace build (including typecheck) passed with `PORT=3000` and `BASE_PATH=/`. The existing nonfatal tooltip sourcemap warning remains.
+- All three Edge browser scripts passed: `browser-smoke.ts`, `browser-family.ts`, and `browser-portfolio.ts`. The new flow verifies child photo submission, grounded synthetic draft generation, explicit parent override, selected-year preview privacy, image readiness before print, PDF generation and mobile overflow, with no page exceptions.
+- Print-media and mobile screenshots were visually inspected. The generated PDF was confirmed as two A4 pages with `pdfinfo`; both pages were rasterized with `pdftoppm` and visually inspected for margins, page breaks and visible review provenance. The sample image is intentionally a one-pixel PNG fixture, not a real child's photo.
+- `git diff --check` passed. The two initial new-browser failures were test selectors assuming ASCII hyphens where UI labels use typographic dashes; selectors were corrected and the complete flow rerun successfully.
+
+No external AI calls, real PostgreSQL/network-driver test, production migration, deployment, push or merge was performed. PGlite databases and browser servers are ephemeral and closed by the test harness. See [current scope and release blockers](PORTFOLIO-GRADING.md).
+
 Node 24 and pnpm 10 are used. If pnpm is not on PATH, prefix commands with `npx --yes pnpm@10.28.2` instead of `pnpm`. Windows x64 native build packages are now allowed; dependency minimum-release-age protection remains unchanged.
 
 ```sh
@@ -9,6 +19,7 @@ pnpm run typecheck
 pnpm test
 pnpm --filter @workspace/api-server exec tsx tests/browser-smoke.ts
 pnpm --filter @workspace/api-server exec tsx tests/browser-family.ts
+pnpm --filter @workspace/api-server exec tsx tests/browser-portfolio.ts
 ```
 
 The browser smoke command runs **after `pnpm test`**. It launches the real API with an ephemeral PGlite adapter, Vite on a loopback-only random port, and headless Edge. It creates fictional learners, creates an assignment through the UI, uploads a synthetic PNG, approves work, verifies a downloaded portfolio, switches children, and checks mobile overflow. It closes its servers/browser and discards the database. Set `BROWSER_CHANNEL=chrome` for installed Chrome. Screenshots are in `artifacts/api-server/.test-build/`; this directory is ignored. No external requests are allowed by the browser harness.
@@ -22,6 +33,8 @@ pnpm run build
 ```
 
 ## Persistent local preview (optional)
+
+See [portfolio and grading workflow](PORTFOLIO-GRADING.md) for printable selections and optional `GRADING_PROVIDER=synthetic`. External AI remains disabled for every configuration.
 
 No persistent DB was provisioned during this task. Docker Desktop was not running. The automated tests need neither Docker nor a network DB. If you already have a dedicated empty local PostgreSQL database, use **only synthetic data** and a database name `homeschool_synthetic` or `homeschool_synthetic_<lowercasealphanumerics>` on `127.0.0.1`.
 

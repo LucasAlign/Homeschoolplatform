@@ -1,5 +1,7 @@
 # AnchorOne: child work foundation
 
+Latest continuation: parent-selected printable portfolios and grounded synthetic grading drafts with explicit acceptance/override are implemented. See [current scope and remaining release phases](PORTFOLIO-GRADING.md). Historical snapshots and roadmap below predate these additions; real AI remains unavailable and production access blocked.
+
 Current continuation: verified family/child sessions, authenticated evidence retrieval and retry-safe recurring lessons are implemented for local synthetic use. See [authorization design and release blockers](AUTHORIZATION-DESIGN.md). The phase-1 snapshot below records the previous commit's scope; it must not be read as the current authentication implementation.
 
 ## Baseline inspected

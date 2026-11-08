@@ -8,6 +8,164 @@
 import * as zod from 'zod';
 
 
+export const PreviewPrintPortfolioParams = zod.object({
+  "studentId": zod.coerce.string()
+})
+
+export const previewPrintPortfolioBodySchoolYearMax = 200;
+
+export const previewPrintPortfolioBodyAssignmentIdsMax = 30;
+
+export const previewPrintPortfolioBodyIncludeEvidenceDefault = true;
+export const previewPrintPortfolioBodyIncludeFeedbackDefault = true;
+export const previewPrintPortfolioBodyIncludeHistoryDefault = false;
+
+export const PreviewPrintPortfolioBody = zod.object({
+  "schoolYear": zod.string().min(1).max(previewPrintPortfolioBodySchoolYearMax),
+  "assignmentIds": zod.array(zod.string()).min(1).max(previewPrintPortfolioBodyAssignmentIdsMax),
+  "includeEvidence": zod.boolean().default(previewPrintPortfolioBodyIncludeEvidenceDefault),
+  "includeFeedback": zod.boolean().default(previewPrintPortfolioBodyIncludeFeedbackDefault),
+  "includeHistory": zod.boolean().default(previewPrintPortfolioBodyIncludeHistoryDefault)
+})
+
+export const previewPrintPortfolioResponseOptionsSchoolYearMax = 200;
+
+export const previewPrintPortfolioResponseOptionsAssignmentIdsMax = 30;
+
+export const previewPrintPortfolioResponseOptionsIncludeEvidenceDefault = true;
+export const previewPrintPortfolioResponseOptionsIncludeFeedbackDefault = true;
+export const previewPrintPortfolioResponseOptionsIncludeHistoryDefault = false;
+export const previewPrintPortfolioResponseWorkItemAttemptsItemReviewsItemScoreMin = 0;
+export const previewPrintPortfolioResponseWorkItemAttemptsItemReviewsItemScoreMax = 100;
+
+
+
+export const PreviewPrintPortfolioResponse = zod.object({
+  "title": zod.string(),
+  "schoolYear": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "learner": zod.object({
+  "name": zod.string(),
+  "gradeLevel": zod.string()
+}),
+  "notice": zod.string(),
+  "options": zod.object({
+  "schoolYear": zod.string().min(1).max(previewPrintPortfolioResponseOptionsSchoolYearMax),
+  "assignmentIds": zod.array(zod.string()).min(1).max(previewPrintPortfolioResponseOptionsAssignmentIdsMax),
+  "includeEvidence": zod.boolean().default(previewPrintPortfolioResponseOptionsIncludeEvidenceDefault),
+  "includeFeedback": zod.boolean().default(previewPrintPortfolioResponseOptionsIncludeFeedbackDefault),
+  "includeHistory": zod.boolean().default(previewPrintPortfolioResponseOptionsIncludeHistoryDefault)
+}),
+  "summary": zod.object({
+  "selected": zod.int(),
+  "approved": zod.int(),
+  "awaitingReview": zod.int(),
+  "unfinished": zod.int(),
+  "subjects": zod.array(zod.string())
+}),
+  "work": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "subject": zod.string(),
+  "curriculum": zod.string(),
+  "sourceType": zod.string(),
+  "instructions": zod.string(),
+  "dueDate": zod.coerce.date(),
+  "status": zod.string(),
+  "attempts": zod.array(zod.object({
+  "submittedAt": zod.coerce.date(),
+  "notes": zod.string(),
+  "evidence": zod.array(zod.object({
+  "name": zod.string(),
+  "dataUrl": zod.string()
+})),
+  "reviews": zod.array(zod.object({
+  "decision": zod.string(),
+  "feedback": zod.string(),
+  "score": zod.int().min(previewPrintPortfolioResponseWorkItemAttemptsItemReviewsItemScoreMin).max(previewPrintPortfolioResponseWorkItemAttemptsItemReviewsItemScoreMax).nullable(),
+  "reviewedAt": zod.coerce.date(),
+  "provenance": zod.string()
+}))
+}))
+}))
+})
+
+
+export const GetGradingDraftsParams = zod.object({
+  "studentId": zod.coerce.string(),
+  "assignmentId": zod.coerce.string()
+})
+
+export const getGradingDraftsResponseDraftsItemScoreMin = 0;
+export const getGradingDraftsResponseDraftsItemScoreMax = 100;
+
+
+
+export const GetGradingDraftsResponse = zod.object({
+  "availability": zod.object({
+  "enabled": zod.boolean(),
+  "reason": zod.string()
+}),
+  "drafts": zod.array(zod.object({
+  "id": zod.string(),
+  "submissionId": zod.string(),
+  "sourceHash": zod.string(),
+  "rubricSnapshot": zod.string(),
+  "provider": zod.string().nullable(),
+  "status": zod.enum(['simulated', 'unavailable', 'failed']),
+  "simulated": zod.literal(true),
+  "feedback": zod.string().nullable(),
+  "score": zod.int().min(getGradingDraftsResponseDraftsItemScoreMin).max(getGradingDraftsResponseDraftsItemScoreMax).nullable(),
+  "grounding": zod.array(zod.object({
+  "rubricQuote": zod.string(),
+  "evidenceQuote": zod.string(),
+  "explanation": zod.string()
+})),
+  "reason": zod.string(),
+  "createdBy": zod.string(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+/**
+ * Parent-only synthetic test workflow. Never real AI grading; never finalizes a grade.
+ */
+export const CreateGradingDraftParams = zod.object({
+  "studentId": zod.coerce.string(),
+  "assignmentId": zod.coerce.string()
+})
+
+export const CreateGradingDraftBody = zod.object({
+  "submissionId": zod.string()
+})
+
+export const createGradingDraftResponseScoreMin = 0;
+export const createGradingDraftResponseScoreMax = 100;
+
+
+
+export const CreateGradingDraftResponse = zod.object({
+  "id": zod.string(),
+  "submissionId": zod.string(),
+  "sourceHash": zod.string(),
+  "rubricSnapshot": zod.string(),
+  "provider": zod.string().nullable(),
+  "status": zod.enum(['simulated', 'unavailable', 'failed']),
+  "simulated": zod.literal(true),
+  "feedback": zod.string().nullable(),
+  "score": zod.int().min(createGradingDraftResponseScoreMin).max(createGradingDraftResponseScoreMax).nullable(),
+  "grounding": zod.array(zod.object({
+  "rubricQuote": zod.string(),
+  "evidenceQuote": zod.string(),
+  "explanation": zod.string()
+})),
+  "reason": zod.string(),
+  "createdBy": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+
+
 export const ScheduleChildWorkParams = zod.object({
   "studentId": zod.coerce.string()
 })
@@ -197,7 +355,9 @@ export const GetChildWorkResponse = zod.object({
   "score": zod.int().min(getChildWorkResponseAssignmentsItemSubmissionsItemReviewsItemScoreMin).max(getChildWorkResponseAssignmentsItemSubmissionsItemReviewsItemScoreMax).nullable(),
   "id": zod.string(),
   "reviewerId": zod.string(),
-  "createdAt": zod.coerce.date()
+  "createdAt": zod.coerce.date(),
+  "gradingDraftId": zod.string().nullish(),
+  "draftAction": zod.union([zod.literal('accepted'),zod.literal('overridden'),zod.literal(null)]).nullish()
 }))
 }))
 })),
@@ -301,7 +461,9 @@ export const ReviewWorkBody = zod.object({
   "submissionId": zod.string(),
   "decision": zod.enum(['approved', 'needs_revision']),
   "feedback": zod.string(),
-  "score": zod.int().min(reviewWorkBodyScoreMin).max(reviewWorkBodyScoreMax).nullable()
+  "score": zod.int().min(reviewWorkBodyScoreMin).max(reviewWorkBodyScoreMax).nullable(),
+  "gradingDraftId": zod.string().nullish(),
+  "draftAction": zod.union([zod.literal('accepted'),zod.literal('overridden'),zod.literal(null)]).nullish()
 })
 
 export const reviewWorkResponseScoreMin = 0;
@@ -316,7 +478,9 @@ export const ReviewWorkResponse = zod.object({
   "score": zod.int().min(reviewWorkResponseScoreMin).max(reviewWorkResponseScoreMax).nullable(),
   "id": zod.string(),
   "reviewerId": zod.string(),
-  "createdAt": zod.coerce.date()
+  "createdAt": zod.coerce.date(),
+  "gradingDraftId": zod.string().nullish(),
+  "draftAction": zod.union([zod.literal('accepted'),zod.literal('overridden'),zod.literal(null)]).nullish()
 })
 
 

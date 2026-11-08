@@ -6,6 +6,7 @@ import {
   submissionsTable,
   reviewsTable,
   scheduleBatchesTable,
+  gradingDraftsTable,
 } from "@workspace/db";
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";
@@ -13,6 +14,13 @@ import { principal, requireParent, canAccessChild } from "../lib/session";
 import { isRasterDataUrl } from "../lib/work-validation";
 import { scheduleInput, planSchedule } from "../lib/schedule";
 import { digest } from "../lib/passwords";
+import { z } from "zod/v4";
+import {
+  runGrading,
+  gradingSourceHash,
+  gradingAvailability,
+} from "../lib/grading";
+import { portfolioInput, printablePortfolio } from "../lib/portfolio";
 import {
   assignmentInput,
   submissionInput,
@@ -48,6 +56,7 @@ async function loadWork(
   parent: boolean,
   includeEvidence = false,
   schoolYear?: string,
+  selectedIds?: string[],
 ) {
   const assignments = await db
     .select()
@@ -56,6 +65,7 @@ async function loadWork(
       and(
         eq(assignmentsTable.studentId, studentId),
         schoolYear ? eq(assignmentsTable.schoolYear, schoolYear) : undefined,
+        selectedIds ? inArray(assignmentsTable.id, selectedIds) : undefined,
       ),
     )
     .orderBy(asc(assignmentsTable.dueDate), asc(assignmentsTable.id));
@@ -139,6 +149,170 @@ router.get(
       student: res.locals.student,
       ...(await loadWork(String(req.params.studentId), true, true, year)),
     });
+  },
+);
+router.post(
+  "/students/:studentId/work/portfolio/preview",
+  requireParent,
+  async (req, res) => {
+    const parsed = portfolioInput.safeParse(req.body);
+    if (!parsed.success) {
+      res
+        .status(400)
+        .json({ error: "Choose a school year and 1–30 distinct assignments." });
+      return;
+    }
+    const work = await loadWork(
+      String(req.params.studentId),
+      true,
+      parsed.data.includeEvidence,
+      parsed.data.schoolYear,
+      parsed.data.assignmentIds,
+    );
+    if (work.assignments.length !== parsed.data.assignmentIds.length) {
+      res
+        .status(404)
+        .json({
+          error:
+            "Selected work is not available for this child and school year.",
+        });
+      return;
+    }
+    const report = printablePortfolio(
+      res.locals.student,
+      work.assignments,
+      parsed.data,
+    );
+    if (Buffer.byteLength(JSON.stringify(report)) > 12 * 1024 * 1024) {
+      res
+        .status(413)
+        .json({
+          error:
+            "This print selection is too large. Choose fewer assignments or omit images.",
+        });
+      return;
+    }
+    res.json(report);
+  },
+);
+router.get(
+  "/students/:studentId/work/:assignmentId/grading-drafts",
+  requireParent,
+  async (req, res) => {
+    const [assignment] = await db
+      .select()
+      .from(assignmentsTable)
+      .where(
+        and(
+          eq(assignmentsTable.id, String(req.params.assignmentId)),
+          eq(assignmentsTable.studentId, String(req.params.studentId)),
+        ),
+      );
+    if (!assignment) {
+      res.status(404).json({ error: "Assignment not found" });
+      return;
+    }
+    const drafts = await db
+      .select({ draft: gradingDraftsTable })
+      .from(gradingDraftsTable)
+      .innerJoin(
+        submissionsTable,
+        eq(gradingDraftsTable.submissionId, submissionsTable.id),
+      )
+      .where(eq(submissionsTable.assignmentId, assignment.id))
+      .orderBy(desc(gradingDraftsTable.createdAt), desc(gradingDraftsTable.id));
+    res.json({
+      availability: gradingAvailability(),
+      drafts: drafts.map((row) => row.draft),
+    });
+  },
+);
+router.post(
+  "/students/:studentId/work/:assignmentId/grading-drafts",
+  requireParent,
+  async (req, res) => {
+    const parsed = z
+      .object({ submissionId: z.string().min(1).max(200) })
+      .strict()
+      .safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: "Choose a submission." });
+      return;
+    }
+    const [assignment] = await db
+      .select()
+      .from(assignmentsTable)
+      .where(
+        and(
+          eq(assignmentsTable.id, String(req.params.assignmentId)),
+          eq(assignmentsTable.studentId, String(req.params.studentId)),
+        ),
+      );
+    if (!assignment) {
+      res.status(404).json({ error: "Assignment not found" });
+      return;
+    }
+    const [submission] = await db
+      .select()
+      .from(submissionsTable)
+      .where(eq(submissionsTable.assignmentId, assignment.id))
+      .orderBy(desc(submissionsTable.createdAt), desc(submissionsTable.id))
+      .limit(1);
+    if (!submission || submission.id !== parsed.data.submissionId) {
+      res
+        .status(409)
+        .json({ error: "Refresh and choose the latest submission." });
+      return;
+    }
+    const sourceHash = gradingSourceHash(assignment.rubric, submission);
+    // The provider receives rubric and typed text only: no child identity or image bytes.
+    const result = await runGrading({
+      rubric: assignment.rubric,
+      notes: submission.notes,
+      imageCount: submission.evidence.length,
+    });
+    const saved = await db.transaction(async (tx) => {
+      const [current] = await tx
+        .select()
+        .from(assignmentsTable)
+        .where(eq(assignmentsTable.id, assignment.id))
+        .for("update");
+      const [latest] = await tx
+        .select()
+        .from(submissionsTable)
+        .where(eq(submissionsTable.assignmentId, assignment.id))
+        .orderBy(desc(submissionsTable.createdAt), desc(submissionsTable.id))
+        .limit(1);
+      if (
+        !current ||
+        !latest ||
+        latest.id !== submission.id ||
+        gradingSourceHash(current.rubric, latest) !== sourceHash
+      )
+        return null;
+      const [draft] = await tx
+        .insert(gradingDraftsTable)
+        .values({
+          id: nanoid(),
+          submissionId: submission.id,
+          sourceHash,
+          rubricSnapshot: assignment.rubric,
+          createdBy: principal(res).userId,
+          ...result,
+        })
+        .returning();
+      return draft;
+    });
+    if (!saved) {
+      res
+        .status(409)
+        .json({
+          error:
+            "Work changed while the draft was being generated. Generate a new draft.",
+        });
+      return;
+    }
+    res.status(201).json(saved);
   },
 );
 router.get(
@@ -323,6 +497,41 @@ router.post(
           status: 409,
           body: { error: "Refresh and review the latest submission." },
         };
+      if (parsed.data.gradingDraftId) {
+        const [draft] = await tx
+          .select()
+          .from(gradingDraftsTable)
+          .where(
+            and(
+              eq(gradingDraftsTable.id, parsed.data.gradingDraftId),
+              eq(gradingDraftsTable.submissionId, latest.id),
+            ),
+          );
+        if (
+          !draft ||
+          draft.status !== "simulated" ||
+          draft.sourceHash !== gradingSourceHash(assignment.rubric, latest)
+        )
+          return {
+            status: 409,
+            body: {
+              error:
+                "This draft is unavailable or stale. Generate a new draft or review manually.",
+            },
+          };
+        if (
+          parsed.data.draftAction === "accepted" &&
+          (parsed.data.feedback !== draft.feedback ||
+            parsed.data.score !== draft.score)
+        )
+          return {
+            status: 400,
+            body: {
+              error:
+                "Choose override when changing suggested feedback or score.",
+            },
+          };
+      }
       const [review] = await tx
         .insert(reviewsTable)
         .values({

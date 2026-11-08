@@ -198,6 +198,17 @@ export const WorkReviewInputDecision = {
   needs_revision: 'needs_revision',
 } as const;
 
+/**
+ * @nullable
+ */
+export type WorkReviewInputDraftAction = typeof WorkReviewInputDraftAction[keyof typeof WorkReviewInputDraftAction] | null;
+
+
+export const WorkReviewInputDraftAction = {
+  accepted: 'accepted',
+  overridden: 'overridden',
+} as const;
+
 export interface WorkReviewInput {
   submissionId: string;
   decision: WorkReviewInputDecision;
@@ -208,6 +219,10 @@ export interface WorkReviewInput {
      * @nullable
      */
   score: number | null;
+  /** @nullable */
+  gradingDraftId?: string | null;
+  /** @nullable */
+  draftAction?: WorkReviewInputDraftAction;
 }
 
 export type WorkReviewDecision = typeof WorkReviewDecision[keyof typeof WorkReviewDecision];
@@ -216,6 +231,17 @@ export type WorkReviewDecision = typeof WorkReviewDecision[keyof typeof WorkRevi
 export const WorkReviewDecision = {
   approved: 'approved',
   needs_revision: 'needs_revision',
+} as const;
+
+/**
+ * @nullable
+ */
+export type WorkReviewDraftAction = typeof WorkReviewDraftAction[keyof typeof WorkReviewDraftAction] | null;
+
+
+export const WorkReviewDraftAction = {
+  accepted: 'accepted',
+  overridden: 'overridden',
 } as const;
 
 export interface WorkReview {
@@ -231,6 +257,10 @@ export interface WorkReview {
   id: string;
   reviewerId: string;
   createdAt: string;
+  /** @nullable */
+  gradingDraftId?: string | null;
+  /** @nullable */
+  draftAction?: WorkReviewDraftAction;
 }
 
 export interface WorkSubmission {
@@ -403,6 +433,135 @@ export interface WorkScheduleInput {
 
 export interface WorkScheduleResult {
   assignmentIds: string[];
+}
+
+export interface GradingGrounding {
+  rubricQuote: string;
+  evidenceQuote: string;
+  explanation: string;
+}
+
+export type GradingDraftViewStatus = typeof GradingDraftViewStatus[keyof typeof GradingDraftViewStatus];
+
+
+export const GradingDraftViewStatus = {
+  simulated: 'simulated',
+  unavailable: 'unavailable',
+  failed: 'failed',
+} as const;
+
+export interface GradingDraftView {
+  id: string;
+  submissionId: string;
+  sourceHash: string;
+  rubricSnapshot: string;
+  /** @nullable */
+  provider: string | null;
+  status: GradingDraftViewStatus;
+  simulated: true;
+  /** @nullable */
+  feedback: string | null;
+  /**
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  score: number | null;
+  grounding: GradingGrounding[];
+  reason: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+export type GradingDraftListAvailability = {
+  enabled: boolean;
+  reason: string;
+};
+
+export interface GradingDraftList {
+  availability: GradingDraftListAvailability;
+  drafts: GradingDraftView[];
+}
+
+export interface GradingDraftRequest {
+  submissionId: string;
+}
+
+export interface PrintPortfolioInput {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  schoolYear: string;
+  /**
+     * @minItems 1
+     * @maxItems 30
+     */
+  assignmentIds: string[];
+  includeEvidence?: boolean;
+  includeFeedback?: boolean;
+  includeHistory?: boolean;
+}
+
+export interface PrintEvidence {
+  name: string;
+  dataUrl: string;
+}
+
+export interface PrintReview {
+  decision: string;
+  feedback: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  score: number | null;
+  reviewedAt: string;
+  provenance: string;
+}
+
+export interface PrintAttempt {
+  submittedAt: string;
+  notes: string;
+  evidence: PrintEvidence[];
+  reviews: PrintReview[];
+}
+
+export interface PrintWork {
+  id: string;
+  title: string;
+  subject: string;
+  curriculum: string;
+  sourceType: string;
+  instructions: string;
+  dueDate: string;
+  status: string;
+  attempts: PrintAttempt[];
+}
+
+export type PrintPortfolioLearner = {
+  name: string;
+  gradeLevel: string;
+};
+
+export type PrintPortfolioSummary = {
+  selected: number;
+  approved: number;
+  awaitingReview: number;
+  unfinished: number;
+  subjects: string[];
+};
+
+export interface PrintPortfolio {
+  title: string;
+  schoolYear: string;
+  createdAt: string;
+  learner: PrintPortfolioLearner;
+  notice: string;
+  options: PrintPortfolioInput;
+  summary: PrintPortfolioSummary;
+  work: PrintWork[];
 }
 
 export type ExportYearPortfolioParams = {

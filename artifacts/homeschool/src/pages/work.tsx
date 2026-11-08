@@ -4,7 +4,14 @@ import { useSession } from "@/components/session-provider";
 import type {
   ChildWork as Work,
   WorkAssignmentWithHistory as Assignment,
+  GradingDraftView,
+  PrintPortfolio,
 } from "@workspace/api-client-react";
+import { GradingDrafts } from "@/components/grading-drafts";
+import {
+  PortfolioBuilder,
+  PortfolioPreview,
+} from "@/components/portfolio-builder";
 
 type Student = { id: string; firstName: string; preferredName: string | null };
 const field = "block w-full border border-gray-400 rounded p-2 mt-1 bg-white";
@@ -41,6 +48,7 @@ export default function WorkPage() {
   const [busy, setBusy] = useState(false);
   const [filter, setFilter] = useState("due");
   const [year, setYear] = useState("");
+  const [printPreview, setPrintPreview] = useState<PrintPortfolio | null>(null);
   useEffect(() => {
     api<Student[]>("/students")
       .then((data) => {
@@ -142,6 +150,13 @@ export default function WorkPage() {
       setBusy(false);
     }
   }
+  if (parent && printPreview)
+    return (
+      <PortfolioPreview
+        report={printPreview}
+        onClose={() => setPrintPreview(null)}
+      />
+    );
   const shown =
     work?.assignments.filter(
       (a) =>
@@ -198,6 +213,14 @@ export default function WorkPage() {
       )}
       {work && (
         <>
+          {parent && (
+            <PortfolioBuilder
+              key={studentId}
+              studentId={studentId}
+              assignments={work.assignments}
+              onPreview={setPrintPreview}
+            />
+          )}
           {parent && (
             <details className="border rounded p-4">
               <summary className="font-semibold cursor-pointer">
@@ -470,6 +493,29 @@ function AssignmentCard({
   const [fileError, setFileError] = useState("");
   const [reading, setReading] = useState(false);
   const latest = a.submissions.at(-1);
+  const reviewForm = useRef<HTMLFormElement>(null);
+  const reviewDetails = useRef<HTMLDetailsElement>(null);
+  const [reviewDraft, setReviewDraft] = useState<GradingDraftView | null>(null);
+  const [draftAction, setDraftAction] = useState<"accepted" | "overridden">(
+    "accepted",
+  );
+  useEffect(() => {
+    setReviewDraft(null);
+    reviewForm.current?.reset();
+  }, [latest?.id]);
+  function applyDraft(draft: GradingDraftView) {
+    setReviewDraft(draft);
+    setDraftAction("accepted");
+    const feedback = reviewForm.current?.elements.namedItem(
+      "feedback",
+    ) as HTMLTextAreaElement | null;
+    const score = reviewForm.current?.elements.namedItem(
+      "score",
+    ) as HTMLInputElement | null;
+    if (feedback) feedback.value = draft.feedback ?? "";
+    if (score) score.value = draft.score === null ? "" : String(draft.score);
+    if (reviewDetails.current) reviewDetails.current.open = true;
+  }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -529,9 +575,13 @@ function AssignmentCard({
         decision: data.get("decision"),
         feedback: data.get("feedback"),
         score: data.get("score") === "" ? null : Number(data.get("score")),
+        gradingDraftId: reviewDraft?.id ?? null,
+        draftAction: reviewDraft ? draftAction : null,
       })
-    )
+    ) {
       form.reset();
+      setReviewDraft(null);
+    }
   }
   return (
     <article className="border rounded-lg p-5 space-y-4">
@@ -583,6 +633,12 @@ function AssignmentCard({
             <p key={r.id} className="whitespace-pre-wrap bg-gray-50 p-3">
               Parent: {r.decision.replaceAll("_", " ")}
               {r.score !== null ? ` (${r.score}/100)` : ""} — {r.feedback}
+              {r.gradingDraftId && (
+                <span className="block text-sm">
+                  Parent {r.draftAction} a synthetic test draft. Not real AI
+                  grading.
+                </span>
+              )}
             </p>
           ))}
         </div>
@@ -611,43 +667,96 @@ function AssignmentCard({
         </form>
       )}
       {parent && latest && (
-        <details>
-          <summary className="cursor-pointer font-semibold">
-            Parent review / override
-          </summary>
-          <form onSubmit={review} className="space-y-3 mt-3">
-            <label className="block">
-              Decision
-              <select aria-label="Decision" name="decision" className={field}>
-                <option value="approved">Approve</option>
-                <option value="needs_revision">Request revision</option>
-              </select>
-            </label>
-            <label className="block">
-              Feedback
-              <textarea
-                name="feedback"
-                required
-                maxLength={10000}
-                className={field}
-              />
-            </label>
-            <label className="block">
-              Score (optional, 0–100)
-              <input
-                name="score"
-                type="number"
-                min={0}
-                max={100}
-                step={1}
-                className={field}
-              />
-            </label>
-            <button className={button} disabled={busy}>
-              Save parent review
-            </button>
-          </form>
-        </details>
+        <>
+          <GradingDrafts
+            key={latest.id}
+            studentId={studentId}
+            assignmentId={a.id}
+            submissionId={latest.id}
+            onApply={applyDraft}
+          />
+          <details ref={reviewDetails}>
+            <summary className="cursor-pointer font-semibold">
+              Parent review / override
+            </summary>
+            <form ref={reviewForm} onSubmit={review} className="space-y-3 mt-3">
+              {reviewDraft && (
+                <div className="border border-amber-400 bg-amber-50 p-3 space-y-2">
+                  <p>
+                    You are reviewing SIMULATED test output, not a real AI
+                    grade. Only your saved decision changes the assignment.
+                  </p>
+                  <label className="block">
+                    Draft review action
+                    <select
+                      aria-label="Draft review action"
+                      className={field}
+                      value={draftAction}
+                      onChange={(e) =>
+                        setDraftAction(
+                          e.target.value as "accepted" | "overridden",
+                        )
+                      }
+                    >
+                      <option value="accepted">
+                        Accept unchanged test suggestion
+                      </option>
+                      <option value="overridden">
+                        Override with my own evaluation
+                      </option>
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    className="underline"
+                    onClick={() => {
+                      setReviewDraft(null);
+                      reviewForm.current?.reset();
+                    }}
+                  >
+                    Clear draft and review manually
+                  </button>
+                </div>
+              )}
+              <label className="block">
+                Decision
+                <select aria-label="Decision" name="decision" className={field}>
+                  <option value="approved">Approve</option>
+                  <option value="needs_revision">Request revision</option>
+                </select>
+              </label>
+              <label className="block">
+                Feedback
+                <textarea
+                  name="feedback"
+                  onChange={() => {
+                    if (reviewDraft) setDraftAction("overridden");
+                  }}
+                  required
+                  maxLength={10000}
+                  className={field}
+                />
+              </label>
+              <label className="block">
+                Score (optional, 0–100)
+                <input
+                  name="score"
+                  onChange={() => {
+                    if (reviewDraft) setDraftAction("overridden");
+                  }}
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={1}
+                  className={field}
+                />
+              </label>
+              <button className={button} disabled={busy}>
+                Save parent review
+              </button>
+            </form>
+          </details>
+        </>
       )}
     </article>
   );

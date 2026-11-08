@@ -20,6 +20,10 @@ tags:
     description: Dashboard summary operations
 
 paths:
+  /students/{studentId}/work/portfolio/preview:
+    $ref: './work.openapi.json#/paths/~1students~1{studentId}~1work~1portfolio~1preview'
+  /students/{studentId}/work/{assignmentId}/grading-drafts:
+    $ref: './work.openapi.json#/paths/~1students~1{studentId}~1work~1{assignmentId}~1grading-drafts'
   /students/{studentId}/work/schedule:
     $ref: './work.openapi.json#/paths/~1students~1{studentId}~1work~1schedule'
   /students/{studentId}/work/portfolio:

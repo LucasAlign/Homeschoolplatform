@@ -72,5 +72,11 @@ export const reviewInput = z
     decision: z.enum(["approved", "needs_revision"]),
     feedback: z.string().trim().min(1).max(10000),
     score: z.number().int().min(0).max(100).nullable().default(null),
+    gradingDraftId: line.nullable().default(null),
+    draftAction: z.enum(["accepted", "overridden"]).nullable().default(null),
   })
-  .strict();
+  .strict()
+  .refine(
+    (v) => Boolean(v.gradingDraftId) === Boolean(v.draftAction),
+    "Choose both a draft and its review action, or neither.",
+  );

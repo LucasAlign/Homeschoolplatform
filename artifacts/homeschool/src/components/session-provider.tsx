@@ -32,7 +32,7 @@ export function PasswordSettings() {
   const [busy, setBusy] = useState(false);
   if (mode !== "family") return null;
   return (
-    <details className="border-b p-3">
+    <details className="account-settings border-b p-3">
       <summary className="cursor-pointer">Account password</summary>
       <form
         className="max-w-md space-y-3 mt-3"

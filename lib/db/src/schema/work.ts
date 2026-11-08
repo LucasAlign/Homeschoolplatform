@@ -5,6 +5,7 @@ import {
   integer,
   jsonb,
   index,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { studentsTable } from "./students";
 export type Evidence = { name: string; dataUrl: string };
@@ -55,6 +56,34 @@ export const submissionsTable = pgTable(
   },
   (t) => [index("submissions_assignment_idx").on(t.assignmentId)],
 );
+export type GradingGrounding = {
+  rubricQuote: string;
+  evidenceQuote: string;
+  explanation: string;
+};
+export const gradingDraftsTable = pgTable(
+  "grading_drafts",
+  {
+    id: text("id").primaryKey(),
+    submissionId: text("submission_id")
+      .notNull()
+      .references(() => submissionsTable.id, { onDelete: "restrict" }),
+    sourceHash: text("source_hash").notNull(),
+    rubricSnapshot: text("rubric_snapshot").notNull(),
+    provider: text("provider"),
+    status: text("status").notNull(),
+    simulated: boolean("simulated").notNull().default(true),
+    feedback: text("feedback"),
+    score: integer("score"),
+    grounding: jsonb("grounding").$type<GradingGrounding[]>().notNull(),
+    reason: text("reason").notNull(),
+    createdBy: text("created_by").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("grading_submission_idx").on(t.submissionId)],
+);
 export const reviewsTable = pgTable(
   "reviews",
   {
@@ -66,6 +95,11 @@ export const reviewsTable = pgTable(
     feedback: text("feedback").notNull(),
     score: integer("score"),
     reviewerId: text("reviewer_id").notNull(),
+    gradingDraftId: text("grading_draft_id").references(
+      () => gradingDraftsTable.id,
+      { onDelete: "restrict" },
+    ),
+    draftAction: text("draft_action"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

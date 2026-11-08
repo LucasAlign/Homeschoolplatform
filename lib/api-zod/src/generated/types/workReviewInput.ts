@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { WorkReviewInputDecision } from './workReviewInputDecision';
+import type { WorkReviewInputDraftAction } from './workReviewInputDraftAction';
 
 export interface WorkReviewInput {
   submissionId: string;
@@ -17,4 +18,8 @@ export interface WorkReviewInput {
      * @nullable
      */
   score: number | null;
+  /** @nullable */
+  gradingDraftId?: string | null;
+  /** @nullable */
+  draftAction?: WorkReviewInputDraftAction;
 }

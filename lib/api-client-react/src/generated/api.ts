@@ -33,12 +33,17 @@ import type {
   ExportYearPortfolio200,
   ExportYearPortfolioParams,
   GetFamilySession200,
+  GradingDraftList,
+  GradingDraftRequest,
+  GradingDraftView,
   HealthStatus,
   Lesson,
   LessonDetail,
   LessonInput,
   LessonUpdate,
   LoginFamilyBody,
+  PrintPortfolio,
+  PrintPortfolioInput,
   PublishToggle,
   RegisterLocalFamilyBody,
   Unit,
@@ -80,6 +85,219 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getPreviewPrintPortfolioUrl = (studentId: string,) => {
+
+
+
+
+  return `/api/students/${studentId}/work/portfolio/preview`
+}
+
+export const previewPrintPortfolio = async (studentId: string,
+    printPortfolioInput: PrintPortfolioInput, options?: Parameters<typeof customFetch>[1]): Promise<PrintPortfolio> => {
+
+  return customFetch<PrintPortfolio>(getPreviewPrintPortfolioUrl(studentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(printPortfolioInput)
+  }
+);}
+
+
+
+
+
+export const getPreviewPrintPortfolioMutationOptions = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewPrintPortfolio>>, TError,{studentId: string;data: BodyType<PrintPortfolioInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof previewPrintPortfolio>>, TError,{studentId: string;data: BodyType<PrintPortfolioInput>}, TContext> => {
+
+const mutationKey = ['previewPrintPortfolio'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof previewPrintPortfolio>>, {studentId: string;data: BodyType<PrintPortfolioInput>}> = (props) => {
+          const {studentId,data} = props ?? {};
+
+          return  previewPrintPortfolio(studentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PreviewPrintPortfolioMutationResult = NonNullable<Awaited<ReturnType<typeof previewPrintPortfolio>>>
+    export type PreviewPrintPortfolioMutationBody = BodyType<PrintPortfolioInput>
+    export type PreviewPrintPortfolioMutationError = ErrorType<WorkError>
+
+    export const usePreviewPrintPortfolio = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewPrintPortfolio>>, TError,{studentId: string;data: BodyType<PrintPortfolioInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof previewPrintPortfolio>>,
+        TError,
+        {studentId: string;data: BodyType<PrintPortfolioInput>},
+        TContext
+      > => {
+      return useMutation(getPreviewPrintPortfolioMutationOptions(options));
+    }
+
+export const getGetGradingDraftsUrl = (studentId: string,
+    assignmentId: string,) => {
+
+
+
+
+  return `/api/students/${studentId}/work/${assignmentId}/grading-drafts`
+}
+
+export const getGradingDrafts = async (studentId: string,
+    assignmentId: string, options?: Parameters<typeof customFetch>[1]): Promise<GradingDraftList> => {
+
+  return customFetch<GradingDraftList>(getGetGradingDraftsUrl(studentId,assignmentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetGradingDraftsQueryKey = (studentId: string,
+    assignmentId: string,) => {
+    return [
+    `/api/students/${studentId}/work/${assignmentId}/grading-drafts`
+    ] as const;
+    }
+
+
+export const getGetGradingDraftsQueryOptions = <TData = Awaited<ReturnType<typeof getGradingDrafts>>, TError = ErrorType<WorkError>>(studentId: string,
+    assignmentId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getGradingDrafts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetGradingDraftsQueryKey(studentId,assignmentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getGradingDrafts>>> = ({ signal }) => getGradingDrafts(studentId,assignmentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined && assignmentId !== null && assignmentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getGradingDrafts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetGradingDraftsQueryResult = NonNullable<Awaited<ReturnType<typeof getGradingDrafts>>>
+export type GetGradingDraftsQueryError = ErrorType<WorkError>
+
+
+
+export function useGetGradingDrafts<TData = Awaited<ReturnType<typeof getGradingDrafts>>, TError = ErrorType<WorkError>>(
+ studentId: string,
+    assignmentId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getGradingDrafts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetGradingDraftsQueryOptions(studentId,assignmentId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateGradingDraftUrl = (studentId: string,
+    assignmentId: string,) => {
+
+
+
+
+  return `/api/students/${studentId}/work/${assignmentId}/grading-drafts`
+}
+
+/**
+ * Parent-only synthetic test workflow. Never real AI grading; never finalizes a grade.
+ */
+export const createGradingDraft = async (studentId: string,
+    assignmentId: string,
+    gradingDraftRequest: GradingDraftRequest, options?: Parameters<typeof customFetch>[1]): Promise<GradingDraftView> => {
+
+  return customFetch<GradingDraftView>(getCreateGradingDraftUrl(studentId,assignmentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(gradingDraftRequest)
+  }
+);}
+
+
+
+
+
+export const getCreateGradingDraftMutationOptions = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createGradingDraft>>, TError,{studentId: string;assignmentId: string;data: BodyType<GradingDraftRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createGradingDraft>>, TError,{studentId: string;assignmentId: string;data: BodyType<GradingDraftRequest>}, TContext> => {
+
+const mutationKey = ['createGradingDraft'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createGradingDraft>>, {studentId: string;assignmentId: string;data: BodyType<GradingDraftRequest>}> = (props) => {
+          const {studentId,assignmentId,data} = props ?? {};
+
+          return  createGradingDraft(studentId,assignmentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateGradingDraftMutationResult = NonNullable<Awaited<ReturnType<typeof createGradingDraft>>>
+    export type CreateGradingDraftMutationBody = BodyType<GradingDraftRequest>
+    export type CreateGradingDraftMutationError = ErrorType<WorkError>
+
+    export const useCreateGradingDraft = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createGradingDraft>>, TError,{studentId: string;assignmentId: string;data: BodyType<GradingDraftRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createGradingDraft>>,
+        TError,
+        {studentId: string;assignmentId: string;data: BodyType<GradingDraftRequest>},
+        TContext
+      > => {
+      return useMutation(getCreateGradingDraftMutationOptions(options));
+    }
 
 export const getScheduleChildWorkUrl = (studentId: string,) => {
 

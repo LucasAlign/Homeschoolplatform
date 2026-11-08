@@ -18,7 +18,9 @@
       ],
       "get": {
         "operationId": "getChildWork",
-        "tags": ["work"],
+        "tags": [
+          "work"
+        ],
         "responses": {
           "200": {
             "description": "All child work with immutable attempt and review history",
@@ -104,7 +106,9 @@
       },
       "post": {
         "operationId": "createWorkAssignment",
-        "tags": ["work"],
+        "tags": [
+          "work"
+        ],
         "description": "Local synthetic-data only. Real family authentication is unavailable.",
         "requestBody": {
           "required": true,
@@ -221,7 +225,9 @@
       ],
       "post": {
         "operationId": "submitWork",
-        "tags": ["work"],
+        "tags": [
+          "work"
+        ],
         "description": "Local synthetic-data only. Real family authentication is unavailable.",
         "requestBody": {
           "required": true,
@@ -338,7 +344,9 @@
       ],
       "post": {
         "operationId": "reviewWork",
-        "tags": ["work"],
+        "tags": [
+          "work"
+        ],
         "description": "Local synthetic-data only. Real family authentication is unavailable.",
         "requestBody": {
           "required": true,
@@ -447,7 +455,9 @@
       ],
       "get": {
         "operationId": "exportYearPortfolio",
-        "tags": ["work"],
+        "tags": [
+          "work"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -520,7 +530,9 @@
       ],
       "get": {
         "operationId": "getPrivateEvidence",
-        "tags": ["work"],
+        "tags": [
+          "work"
+        ],
         "responses": {
           "200": {
             "description": "Private raster bytes; no-store, nosniff and sandbox headers",
@@ -561,7 +573,9 @@
       ],
       "post": {
         "operationId": "scheduleChildWork",
-        "tags": ["work"],
+        "tags": [
+          "work"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -610,6 +624,353 @@
           }
         }
       }
+    },
+    "/students/{studentId}/work/portfolio/preview": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "previewPrintPortfolio",
+        "tags": [
+          "work"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrintPortfolioInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrintPortfolio"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/{studentId}/work/{assignmentId}/grading-drafts": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "assignmentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getGradingDrafts",
+        "tags": [
+          "work"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradingDraftList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createGradingDraft",
+        "tags": [
+          "work"
+        ],
+        "description": "Parent-only synthetic test workflow. Never real AI grading; never finalizes a grade.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradingDraftRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradingDraftView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -628,13 +989,21 @@
           },
           "sourceType": {
             "type": "string",
-            "enum": ["textbook", "offline", "website", "custom"]
+            "enum": [
+              "textbook",
+              "offline",
+              "website",
+              "custom"
+            ]
           },
           "instructions": {
             "type": "string"
           },
           "resourceUrl": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "dueDate": {
             "type": "string",
@@ -672,7 +1041,10 @@
             "description": "PNG/JPEG base64 data URL, maximum decoded size 1 MiB. Synthetic fixtures only."
           }
         },
-        "required": ["name", "dataUrl"],
+        "required": [
+          "name",
+          "dataUrl"
+        ],
         "additionalProperties": false
       },
       "WorkSubmissionInput": {
@@ -690,7 +1062,10 @@
             "maxItems": 2
           }
         },
-        "required": ["notes", "evidence"],
+        "required": [
+          "notes",
+          "evidence"
+        ],
         "additionalProperties": false
       },
       "WorkReviewInput": {
@@ -701,18 +1076,46 @@
           },
           "decision": {
             "type": "string",
-            "enum": ["approved", "needs_revision"]
+            "enum": [
+              "approved",
+              "needs_revision"
+            ]
           },
           "feedback": {
             "type": "string"
           },
           "score": {
-            "type": ["integer", "null"],
+            "type": [
+              "integer",
+              "null"
+            ],
             "minimum": 0,
             "maximum": 100
+          },
+          "gradingDraftId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "draftAction": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "accepted",
+              "overridden",
+              null
+            ]
           }
         },
-        "required": ["submissionId", "decision", "feedback", "score"],
+        "required": [
+          "submissionId",
+          "decision",
+          "feedback",
+          "score"
+        ],
         "additionalProperties": false
       },
       "WorkReview": {
@@ -723,13 +1126,19 @@
           },
           "decision": {
             "type": "string",
-            "enum": ["approved", "needs_revision"]
+            "enum": [
+              "approved",
+              "needs_revision"
+            ]
           },
           "feedback": {
             "type": "string"
           },
           "score": {
-            "type": ["integer", "null"],
+            "type": [
+              "integer",
+              "null"
+            ],
             "minimum": 0,
             "maximum": 100
           },
@@ -742,6 +1151,23 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "gradingDraftId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "draftAction": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "accepted",
+              "overridden",
+              null
+            ]
           }
         },
         "required": [
@@ -778,7 +1204,13 @@
             "format": "date-time"
           }
         },
-        "required": ["id", "assignmentId", "notes", "evidence", "createdAt"],
+        "required": [
+          "id",
+          "assignmentId",
+          "notes",
+          "evidence",
+          "createdAt"
+        ],
         "additionalProperties": false
       },
       "WorkSubmissionWithReviews": {
@@ -834,13 +1266,21 @@
           },
           "sourceType": {
             "type": "string",
-            "enum": ["textbook", "offline", "website", "custom"]
+            "enum": [
+              "textbook",
+              "offline",
+              "website",
+              "custom"
+            ]
           },
           "instructions": {
             "type": "string"
           },
           "resourceUrl": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "dueDate": {
             "type": "string",
@@ -860,7 +1300,12 @@
           },
           "status": {
             "type": "string",
-            "enum": ["assigned", "submitted", "needs_revision", "approved"]
+            "enum": [
+              "assigned",
+              "submitted",
+              "needs_revision",
+              "approved"
+            ]
           },
           "createdAt": {
             "type": "string",
@@ -898,13 +1343,21 @@
           },
           "sourceType": {
             "type": "string",
-            "enum": ["textbook", "offline", "website", "custom"]
+            "enum": [
+              "textbook",
+              "offline",
+              "website",
+              "custom"
+            ]
           },
           "instructions": {
             "type": "string"
           },
           "resourceUrl": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "dueDate": {
             "type": "string",
@@ -925,7 +1378,12 @@
           },
           "status": {
             "type": "string",
-            "enum": ["assigned", "submitted", "needs_revision", "approved"]
+            "enum": [
+              "assigned",
+              "submitted",
+              "needs_revision",
+              "approved"
+            ]
           },
           "createdAt": {
             "type": "string",
@@ -968,10 +1426,17 @@
                 "type": "string"
               },
               "preferredName": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               }
             },
-            "required": ["id", "firstName", "preferredName"],
+            "required": [
+              "id",
+              "firstName",
+              "preferredName"
+            ],
             "additionalProperties": true
           },
           "assignments": {
@@ -985,17 +1450,26 @@
             "properties": {
               "status": {
                 "type": "string",
-                "enum": ["unavailable"]
+                "enum": [
+                  "unavailable"
+                ]
               },
               "reason": {
                 "type": "string"
               }
             },
-            "required": ["status", "reason"],
+            "required": [
+              "status",
+              "reason"
+            ],
             "additionalProperties": false
           }
         },
-        "required": ["student", "assignments", "ai"],
+        "required": [
+          "student",
+          "assignments",
+          "ai"
+        ],
         "additionalProperties": false
       },
       "WorkError": {
@@ -1005,12 +1479,17 @@
             "type": "string"
           }
         },
-        "required": ["error"],
+        "required": [
+          "error"
+        ],
         "additionalProperties": false
       },
       "WorkPrivateEvidence": {
         "type": "object",
-        "required": ["name", "url"],
+        "required": [
+          "name",
+          "url"
+        ],
         "properties": {
           "name": {
             "type": "string"
@@ -1037,13 +1516,21 @@
           },
           "sourceType": {
             "type": "string",
-            "enum": ["textbook", "offline", "website", "custom"]
+            "enum": [
+              "textbook",
+              "offline",
+              "website",
+              "custom"
+            ]
           },
           "instructions": {
             "type": "string"
           },
           "resourceUrl": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "schoolYear": {
             "type": "string"
@@ -1111,7 +1598,406 @@
             }
           }
         },
-        "required": ["assignmentIds"]
+        "required": [
+          "assignmentIds"
+        ]
+      },
+      "GradingGrounding": {
+        "type": "object",
+        "required": [
+          "rubricQuote",
+          "evidenceQuote",
+          "explanation"
+        ],
+        "properties": {
+          "rubricQuote": {
+            "type": "string"
+          },
+          "evidenceQuote": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GradingDraftView": {
+        "type": "object",
+        "required": [
+          "id",
+          "submissionId",
+          "sourceHash",
+          "rubricSnapshot",
+          "provider",
+          "status",
+          "simulated",
+          "feedback",
+          "score",
+          "grounding",
+          "reason",
+          "createdBy",
+          "createdAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "submissionId": {
+            "type": "string"
+          },
+          "sourceHash": {
+            "type": "string"
+          },
+          "rubricSnapshot": {
+            "type": "string"
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "simulated",
+              "unavailable",
+              "failed"
+            ]
+          },
+          "simulated": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "feedback": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "grounding": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GradingGrounding"
+            }
+          },
+          "reason": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GradingDraftList": {
+        "type": "object",
+        "required": [
+          "availability",
+          "drafts"
+        ],
+        "properties": {
+          "availability": {
+            "type": "object",
+            "required": [
+              "enabled",
+              "reason"
+            ],
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "drafts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GradingDraftView"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "GradingDraftRequest": {
+        "type": "object",
+        "required": [
+          "submissionId"
+        ],
+        "properties": {
+          "submissionId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrintPortfolioInput": {
+        "type": "object",
+        "required": [
+          "schoolYear",
+          "assignmentIds"
+        ],
+        "properties": {
+          "schoolYear": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "assignmentIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 30,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeEvidence": {
+            "type": "boolean",
+            "default": true
+          },
+          "includeFeedback": {
+            "type": "boolean",
+            "default": true
+          },
+          "includeHistory": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrintEvidence": {
+        "type": "object",
+        "required": [
+          "name",
+          "dataUrl"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "dataUrl": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrintReview": {
+        "type": "object",
+        "required": [
+          "decision",
+          "feedback",
+          "score",
+          "reviewedAt",
+          "provenance"
+        ],
+        "properties": {
+          "decision": {
+            "type": "string"
+          },
+          "feedback": {
+            "type": "string"
+          },
+          "score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "reviewedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "provenance": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrintAttempt": {
+        "type": "object",
+        "required": [
+          "submittedAt",
+          "notes",
+          "evidence",
+          "reviews"
+        ],
+        "properties": {
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintEvidence"
+            }
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintReview"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrintWork": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "subject",
+          "curriculum",
+          "sourceType",
+          "instructions",
+          "dueDate",
+          "status",
+          "attempts"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "curriculum": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string"
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string"
+          },
+          "attempts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintAttempt"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrintPortfolio": {
+        "type": "object",
+        "required": [
+          "title",
+          "schoolYear",
+          "createdAt",
+          "learner",
+          "notice",
+          "options",
+          "summary",
+          "work"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "schoolYear": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "learner": {
+            "type": "object",
+            "required": [
+              "name",
+              "gradeLevel"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "gradeLevel": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "notice": {
+            "type": "string"
+          },
+          "options": {
+            "$ref": "#/components/schemas/PrintPortfolioInput"
+          },
+          "summary": {
+            "type": "object",
+            "required": [
+              "selected",
+              "approved",
+              "awaitingReview",
+              "unfinished",
+              "subjects"
+            ],
+            "properties": {
+              "selected": {
+                "type": "integer"
+              },
+              "approved": {
+                "type": "integer"
+              },
+              "awaitingReview": {
+                "type": "integer"
+              },
+              "unfinished": {
+                "type": "integer"
+              },
+              "subjects": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "work": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintWork"
+            }
+          }
+        },
+        "additionalProperties": false
       }
     }
   }

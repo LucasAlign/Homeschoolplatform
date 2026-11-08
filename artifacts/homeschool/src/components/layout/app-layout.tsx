@@ -15,7 +15,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary/20">
-      <header className="border-b border-black">
+      <header className="app-header border-b border-black">
         <div className="grid grid-cols-12 items-stretch">
           <div className="col-span-12 md:col-span-3 flex items-center gap-3 px-6 py-4 border-b md:border-b-0 md:border-r border-black">
             <span className="block w-3 h-3 bg-black" />
@@ -65,7 +65,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       </header>
 
       <main className="flex-1 flex flex-col">
-        <p className="border-b p-3 text-sm bg-amber-50">
+        <p className="development-banner border-b p-3 text-sm bg-amber-50">
           Development only: fictional learners and sample work. Production
           access is disabled.
         </p>
@@ -73,7 +73,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         {children}
       </main>
 
-      <footer className="bg-black text-white">
+      <footer className="app-footer bg-black text-white">
         <div className="grid grid-cols-12 items-stretch border-t border-black">
           <div className="col-span-12 md:col-span-9 px-6 py-6 border-b md:border-b-0 md:border-r border-gray-500/30">
             <span className="label-caps text-[#9C9C9C]">

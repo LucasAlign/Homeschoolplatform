@@ -10,11 +10,15 @@ import { request as httpRequest } from "node:http";
 import { syntheticConfiguration } from "../src/lib/access";
 import { assignmentInput, submissionInput } from "../src/lib/work-validation";
 import { familyCases } from "./family-cases";
+import { portfolioGradingCases } from "./portfolio-grading-cases";
 import { planSchedule, scheduleInput } from "../src/lib/schedule";
 
 let server: Server;
 let base: string;
 let fixture: import("@electric-sql/pglite").PGlite;
+test("parent-selected print portfolios and synthetic grading drafts enforce privacy, grounding and review provenance", async () => {
+  await portfolioGradingCases(base, fixture);
+});
 test("verified family sessions enforce parent/child permissions, private evidence and session lifecycle", async () => {
   await familyCases(base, fixture);
 });
