@@ -8,6 +8,176 @@
 import * as zod from 'zod';
 
 
+export const GetChildWorkParams = zod.object({
+  "studentId": zod.coerce.string()
+})
+
+export const getChildWorkResponseAssignmentsItemSubmissionsItemEvidenceItemDataUrlMax = 1400000;
+
+export const getChildWorkResponseAssignmentsItemSubmissionsItemReviewsItemScoreMin = 0;
+export const getChildWorkResponseAssignmentsItemSubmissionsItemReviewsItemScoreMax = 100;
+
+
+
+export const GetChildWorkResponse = zod.object({
+  "student": zod.object({
+  "id": zod.string(),
+  "firstName": zod.string(),
+  "preferredName": zod.string().nullable()
+}),
+  "assignments": zod.array(zod.object({
+  "title": zod.string(),
+  "subject": zod.string(),
+  "curriculum": zod.string(),
+  "sourceType": zod.enum(['textbook', 'offline', 'website', 'custom']),
+  "instructions": zod.string(),
+  "resourceUrl": zod.string().nullable(),
+  "dueDate": zod.coerce.date(),
+  "schoolYear": zod.string(),
+  "rubric": zod.string(),
+  "id": zod.string(),
+  "studentId": zod.string(),
+  "status": zod.enum(['assigned', 'submitted', 'needs_revision', 'approved']),
+  "createdAt": zod.coerce.date(),
+  "submissions": zod.array(zod.object({
+  "id": zod.string(),
+  "assignmentId": zod.string(),
+  "notes": zod.string(),
+  "evidence": zod.array(zod.object({
+  "name": zod.string(),
+  "dataUrl": zod.string().max(getChildWorkResponseAssignmentsItemSubmissionsItemEvidenceItemDataUrlMax).describe('PNG\/JPEG base64 data URL, maximum decoded size 1 MiB. Synthetic fixtures only.')
+})),
+  "createdAt": zod.coerce.date(),
+  "reviews": zod.array(zod.object({
+  "submissionId": zod.string(),
+  "decision": zod.enum(['approved', 'needs_revision']),
+  "feedback": zod.string(),
+  "score": zod.int().min(getChildWorkResponseAssignmentsItemSubmissionsItemReviewsItemScoreMin).max(getChildWorkResponseAssignmentsItemSubmissionsItemReviewsItemScoreMax).nullable(),
+  "id": zod.string(),
+  "reviewerId": zod.string(),
+  "createdAt": zod.coerce.date()
+}))
+}))
+})),
+  "ai": zod.object({
+  "status": zod.enum(['unavailable']),
+  "reason": zod.string()
+})
+})
+
+
+/**
+ * Local synthetic-data only. Real family authentication is unavailable.
+ */
+export const CreateWorkAssignmentParams = zod.object({
+  "studentId": zod.coerce.string()
+})
+
+export const CreateWorkAssignmentBody = zod.object({
+  "title": zod.string(),
+  "subject": zod.string(),
+  "curriculum": zod.string(),
+  "sourceType": zod.enum(['textbook', 'offline', 'website', 'custom']),
+  "instructions": zod.string(),
+  "resourceUrl": zod.string().nullable(),
+  "dueDate": zod.coerce.date(),
+  "schoolYear": zod.string(),
+  "rubric": zod.string()
+})
+
+export const CreateWorkAssignmentResponse = zod.object({
+  "title": zod.string(),
+  "subject": zod.string(),
+  "curriculum": zod.string(),
+  "sourceType": zod.enum(['textbook', 'offline', 'website', 'custom']),
+  "instructions": zod.string(),
+  "resourceUrl": zod.string().nullable(),
+  "dueDate": zod.coerce.date(),
+  "schoolYear": zod.string(),
+  "rubric": zod.string(),
+  "id": zod.string(),
+  "studentId": zod.string(),
+  "status": zod.enum(['assigned', 'submitted', 'needs_revision', 'approved']),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * Local synthetic-data only. Real family authentication is unavailable.
+ */
+export const SubmitWorkParams = zod.object({
+  "studentId": zod.coerce.string(),
+  "assignmentId": zod.coerce.string()
+})
+
+export const submitWorkBodyNotesMax = 10000;
+
+export const submitWorkBodyEvidenceItemDataUrlMax = 1400000;
+
+export const submitWorkBodyEvidenceMax = 2;
+
+
+
+export const SubmitWorkBody = zod.object({
+  "notes": zod.string().max(submitWorkBodyNotesMax),
+  "evidence": zod.array(zod.object({
+  "name": zod.string(),
+  "dataUrl": zod.string().max(submitWorkBodyEvidenceItemDataUrlMax).describe('PNG\/JPEG base64 data URL, maximum decoded size 1 MiB. Synthetic fixtures only.')
+})).max(submitWorkBodyEvidenceMax)
+})
+
+export const submitWorkResponseEvidenceItemDataUrlMax = 1400000;
+
+
+
+export const SubmitWorkResponse = zod.object({
+  "id": zod.string(),
+  "assignmentId": zod.string(),
+  "notes": zod.string(),
+  "evidence": zod.array(zod.object({
+  "name": zod.string(),
+  "dataUrl": zod.string().max(submitWorkResponseEvidenceItemDataUrlMax).describe('PNG\/JPEG base64 data URL, maximum decoded size 1 MiB. Synthetic fixtures only.')
+})),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * Local synthetic-data only. Real family authentication is unavailable.
+ */
+export const ReviewWorkParams = zod.object({
+  "studentId": zod.coerce.string(),
+  "assignmentId": zod.coerce.string()
+})
+
+export const reviewWorkBodyScoreMin = 0;
+export const reviewWorkBodyScoreMax = 100;
+
+
+
+export const ReviewWorkBody = zod.object({
+  "submissionId": zod.string(),
+  "decision": zod.enum(['approved', 'needs_revision']),
+  "feedback": zod.string(),
+  "score": zod.int().min(reviewWorkBodyScoreMin).max(reviewWorkBodyScoreMax).nullable()
+})
+
+export const reviewWorkResponseScoreMin = 0;
+export const reviewWorkResponseScoreMax = 100;
+
+
+
+export const ReviewWorkResponse = zod.object({
+  "submissionId": zod.string(),
+  "decision": zod.enum(['approved', 'needs_revision']),
+  "feedback": zod.string(),
+  "score": zod.int().min(reviewWorkResponseScoreMin).max(reviewWorkResponseScoreMax).nullable(),
+  "id": zod.string(),
+  "reviewerId": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+
+
 /**
  * @summary Health check
  */

@@ -1,0 +1,836 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Child Work",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/students/{studentId}/work": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getChildWork",
+        "tags": ["work"],
+        "responses": {
+          "200": {
+            "description": "All child work with immutable attempt and review history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildWork"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createWorkAssignment",
+        "tags": ["work"],
+        "description": "Local synthetic-data only. Real family authentication is unavailable.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkAssignmentInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkAssignment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/{studentId}/work/{assignmentId}/submissions": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "assignmentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "submitWork",
+        "tags": ["work"],
+        "description": "Local synthetic-data only. Real family authentication is unavailable.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkSubmissionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkSubmission"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/{studentId}/work/{assignmentId}/reviews": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "assignmentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "reviewWork",
+        "tags": ["work"],
+        "description": "Local synthetic-data only. Real family authentication is unavailable.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkReviewInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkReview"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "WorkAssignmentInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "curriculum": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": ["textbook", "offline", "website", "custom"]
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "resourceUrl": {
+            "type": ["string", "null"]
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "schoolYear": {
+            "type": "string"
+          },
+          "rubric": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "subject",
+          "curriculum",
+          "sourceType",
+          "instructions",
+          "resourceUrl",
+          "dueDate",
+          "schoolYear",
+          "rubric"
+        ],
+        "additionalProperties": false
+      },
+      "WorkEvidence": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "dataUrl": {
+            "type": "string",
+            "maxLength": 1400000,
+            "description": "PNG/JPEG base64 data URL, maximum decoded size 1 MiB. Synthetic fixtures only."
+          }
+        },
+        "required": ["name", "dataUrl"],
+        "additionalProperties": false
+      },
+      "WorkSubmissionInput": {
+        "type": "object",
+        "properties": {
+          "notes": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkEvidence"
+            },
+            "maxItems": 2
+          }
+        },
+        "required": ["notes", "evidence"],
+        "additionalProperties": false
+      },
+      "WorkReviewInput": {
+        "type": "object",
+        "properties": {
+          "submissionId": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": ["approved", "needs_revision"]
+          },
+          "feedback": {
+            "type": "string"
+          },
+          "score": {
+            "type": ["integer", "null"],
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": ["submissionId", "decision", "feedback", "score"],
+        "additionalProperties": false
+      },
+      "WorkReview": {
+        "type": "object",
+        "properties": {
+          "submissionId": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": ["approved", "needs_revision"]
+          },
+          "feedback": {
+            "type": "string"
+          },
+          "score": {
+            "type": ["integer", "null"],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "id": {
+            "type": "string"
+          },
+          "reviewerId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "submissionId",
+          "decision",
+          "feedback",
+          "score",
+          "id",
+          "reviewerId",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "WorkSubmission": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "assignmentId": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkEvidence"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["id", "assignmentId", "notes", "evidence", "createdAt"],
+        "additionalProperties": false
+      },
+      "WorkSubmissionWithReviews": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "assignmentId": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkEvidence"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkReview"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "assignmentId",
+          "notes",
+          "evidence",
+          "createdAt",
+          "reviews"
+        ],
+        "additionalProperties": false
+      },
+      "WorkAssignment": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "curriculum": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": ["textbook", "offline", "website", "custom"]
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "resourceUrl": {
+            "type": ["string", "null"]
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "schoolYear": {
+            "type": "string"
+          },
+          "rubric": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "studentId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["assigned", "submitted", "needs_revision", "approved"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "title",
+          "subject",
+          "curriculum",
+          "sourceType",
+          "instructions",
+          "resourceUrl",
+          "dueDate",
+          "schoolYear",
+          "rubric",
+          "id",
+          "studentId",
+          "status",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "WorkAssignmentWithHistory": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "curriculum": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": ["textbook", "offline", "website", "custom"]
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "resourceUrl": {
+            "type": ["string", "null"]
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "schoolYear": {
+            "type": "string"
+          },
+          "rubric": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "studentId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["assigned", "submitted", "needs_revision", "approved"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "submissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkSubmissionWithReviews"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "subject",
+          "curriculum",
+          "sourceType",
+          "instructions",
+          "resourceUrl",
+          "dueDate",
+          "schoolYear",
+          "rubric",
+          "id",
+          "studentId",
+          "status",
+          "createdAt",
+          "submissions"
+        ],
+        "additionalProperties": false
+      },
+      "ChildWork": {
+        "type": "object",
+        "properties": {
+          "student": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "firstName": {
+                "type": "string"
+              },
+              "preferredName": {
+                "type": ["string", "null"]
+              }
+            },
+            "required": ["id", "firstName", "preferredName"],
+            "additionalProperties": true
+          },
+          "assignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkAssignmentWithHistory"
+            }
+          },
+          "ai": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["unavailable"]
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": ["status", "reason"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["student", "assignments", "ai"],
+        "additionalProperties": false
+      },
+      "WorkError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": ["error"],
+        "additionalProperties": false
+      }
+    }
+  }
+}

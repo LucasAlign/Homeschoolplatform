@@ -14,6 +14,7 @@ import NotFound from "@/pages/not-found";
 import NewStudentPage from "@/pages/students/new";
 import CurriculumSetupPage from "@/pages/students/curriculum";
 import { ReactNode } from "react";
+import WorkPage from "@/pages/work";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,6 +31,7 @@ function Router() {
       <RoutedErrorBoundary>
         <Switch>
           <Route path="/" component={DashboardPage} />
+          <Route path="/work" component={WorkPage} />
           <Route path="/students/new" component={NewStudentPage} />
           <Route path="/students/:id/curriculum" component={CurriculumSetupPage} />
           <Route path="/courses" component={CoursesPage} />

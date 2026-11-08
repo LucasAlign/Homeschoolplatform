@@ -4,6 +4,7 @@ import { unitsTable, coursesTable } from "@workspace/db";
 import { eq, and, count } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { DEMO_USER_ID, ensureDemoUser } from "../lib/user";
+import { ownsUnit } from "../lib/ownership";
 
 const router = Router();
 
@@ -55,6 +56,7 @@ router.post("/courses/:id/units", async (req, res): Promise<void> => {
 router.delete("/units/:unitId", async (req, res): Promise<void> => {
   await ensureDemoUser();
   const { unitId } = req.params;
+  if (!await ownsUnit(unitId)) { res.status(404).json({ error: "Unit not found" }); return; }
 
   await db.delete(unitsTable).where(eq(unitsTable.id, unitId));
   res.sendStatus(204);

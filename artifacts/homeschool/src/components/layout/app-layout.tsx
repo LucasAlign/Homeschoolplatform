@@ -6,6 +6,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   const navItems = [
     { href: "/", label: "Dashboard" },
+    { href: "/work", label: "Daily work" },
     { href: "/students/new", label: "Students" },
     { href: "/courses", label: "Curriculum" },
   ];
@@ -27,7 +28,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex-1 flex items-center justify-center px-4 py-4 label-caps transition-colors ${
+                    className={`flex-1 min-w-0 flex items-center justify-center px-2 sm:px-4 py-4 label-caps transition-colors ${
                       isActive 
                         ? "bg-black text-white" 
                         : "text-black hover:bg-black hover:text-white"
@@ -47,6 +48,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       </header>
 
       <main className="flex-1 flex flex-col">
+        <p className="border-b p-3 text-sm bg-amber-50">Development only: fictional learners and sample work. Real family sign-in is not configured.</p>
         {children}
       </main>
 

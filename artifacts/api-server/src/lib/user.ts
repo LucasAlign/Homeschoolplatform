@@ -16,6 +16,6 @@ export async function ensureDemoUser() {
       id: DEMO_USER_ID,
       email: DEMO_USER_EMAIL,
       name: "Demo Parent",
-    });
+    }).onConflictDoNothing();
   }
 }

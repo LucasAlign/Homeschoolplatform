@@ -4,8 +4,17 @@ import { lessonsTable, unitsTable, coursesTable } from "@workspace/db";
 import { eq, and, count } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { DEMO_USER_ID, ensureDemoUser } from "../lib/user";
+import { ownsLesson, ownsUnit } from "../lib/ownership";
 
 const router = Router();
+router.use("/lessons/:lessonId", async (req, res, next) => {
+  if (!await ownsLesson(req.params.lessonId)) { res.status(404).json({ error: "Lesson not found" }); return; }
+  next();
+});
+router.use("/units/:unitId/lessons", async (req, res, next) => {
+  if (!await ownsUnit(req.params.unitId)) { res.status(404).json({ error: "Unit not found" }); return; }
+  next();
+});
 
 // Create lesson for a unit
 router.post("/units/:unitId/lessons", async (req, res): Promise<void> => {

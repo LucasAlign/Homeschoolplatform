@@ -20,6 +20,12 @@ tags:
     description: Dashboard summary operations
 
 paths:
+  /students/{studentId}/work:
+    $ref: './work.openapi.json#/paths/~1students~1{studentId}~1work'
+  /students/{studentId}/work/{assignmentId}/submissions:
+    $ref: './work.openapi.json#/paths/~1students~1{studentId}~1work~1{assignmentId}~1submissions'
+  /students/{studentId}/work/{assignmentId}/reviews:
+    $ref: './work.openapi.json#/paths/~1students~1{studentId}~1work~1{assignmentId}~1reviews'
   /healthz:
     get:
       operationId: healthCheck
