@@ -20,21 +20,43 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ChangeFamilyPasswordBody,
+  ChildWork,
   Course,
   CourseDetail,
   CourseInput,
   CourseUpdate,
   CourseWithCounts,
+  CreateChildLoginBody,
   DashboardSummary,
   ErrorResponse,
+  ExportYearPortfolio200,
+  ExportYearPortfolioParams,
+  GetFamilySession200,
+  GradingDraftList,
+  GradingDraftRequest,
+  GradingDraftView,
   HealthStatus,
   Lesson,
   LessonDetail,
   LessonInput,
   LessonUpdate,
+  LoginFamilyBody,
+  PrintPortfolio,
+  PrintPortfolioInput,
   PublishToggle,
+  RegisterLocalFamilyBody,
   Unit,
-  UnitInput
+  UnitInput,
+  WorkAssignment,
+  WorkAssignmentInput,
+  WorkError,
+  WorkReview,
+  WorkReviewInput,
+  WorkScheduleInput,
+  WorkScheduleResult,
+  WorkSubmission,
+  WorkSubmissionInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -63,6 +85,1133 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getPreviewPrintPortfolioUrl = (studentId: string,) => {
+
+
+
+
+  return `/api/students/${studentId}/work/portfolio/preview`
+}
+
+export const previewPrintPortfolio = async (studentId: string,
+    printPortfolioInput: PrintPortfolioInput, options?: Parameters<typeof customFetch>[1]): Promise<PrintPortfolio> => {
+
+  return customFetch<PrintPortfolio>(getPreviewPrintPortfolioUrl(studentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(printPortfolioInput)
+  }
+);}
+
+
+
+
+
+export const getPreviewPrintPortfolioMutationOptions = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewPrintPortfolio>>, TError,{studentId: string;data: BodyType<PrintPortfolioInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof previewPrintPortfolio>>, TError,{studentId: string;data: BodyType<PrintPortfolioInput>}, TContext> => {
+
+const mutationKey = ['previewPrintPortfolio'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof previewPrintPortfolio>>, {studentId: string;data: BodyType<PrintPortfolioInput>}> = (props) => {
+          const {studentId,data} = props ?? {};
+
+          return  previewPrintPortfolio(studentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PreviewPrintPortfolioMutationResult = NonNullable<Awaited<ReturnType<typeof previewPrintPortfolio>>>
+    export type PreviewPrintPortfolioMutationBody = BodyType<PrintPortfolioInput>
+    export type PreviewPrintPortfolioMutationError = ErrorType<WorkError>
+
+    export const usePreviewPrintPortfolio = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewPrintPortfolio>>, TError,{studentId: string;data: BodyType<PrintPortfolioInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof previewPrintPortfolio>>,
+        TError,
+        {studentId: string;data: BodyType<PrintPortfolioInput>},
+        TContext
+      > => {
+      return useMutation(getPreviewPrintPortfolioMutationOptions(options));
+    }
+
+export const getGetGradingDraftsUrl = (studentId: string,
+    assignmentId: string,) => {
+
+
+
+
+  return `/api/students/${studentId}/work/${assignmentId}/grading-drafts`
+}
+
+export const getGradingDrafts = async (studentId: string,
+    assignmentId: string, options?: Parameters<typeof customFetch>[1]): Promise<GradingDraftList> => {
+
+  return customFetch<GradingDraftList>(getGetGradingDraftsUrl(studentId,assignmentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetGradingDraftsQueryKey = (studentId: string,
+    assignmentId: string,) => {
+    return [
+    `/api/students/${studentId}/work/${assignmentId}/grading-drafts`
+    ] as const;
+    }
+
+
+export const getGetGradingDraftsQueryOptions = <TData = Awaited<ReturnType<typeof getGradingDrafts>>, TError = ErrorType<WorkError>>(studentId: string,
+    assignmentId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getGradingDrafts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetGradingDraftsQueryKey(studentId,assignmentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getGradingDrafts>>> = ({ signal }) => getGradingDrafts(studentId,assignmentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined && assignmentId !== null && assignmentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getGradingDrafts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetGradingDraftsQueryResult = NonNullable<Awaited<ReturnType<typeof getGradingDrafts>>>
+export type GetGradingDraftsQueryError = ErrorType<WorkError>
+
+
+
+export function useGetGradingDrafts<TData = Awaited<ReturnType<typeof getGradingDrafts>>, TError = ErrorType<WorkError>>(
+ studentId: string,
+    assignmentId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getGradingDrafts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetGradingDraftsQueryOptions(studentId,assignmentId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateGradingDraftUrl = (studentId: string,
+    assignmentId: string,) => {
+
+
+
+
+  return `/api/students/${studentId}/work/${assignmentId}/grading-drafts`
+}
+
+/**
+ * Parent-only synthetic test workflow. Never real AI grading; never finalizes a grade.
+ */
+export const createGradingDraft = async (studentId: string,
+    assignmentId: string,
+    gradingDraftRequest: GradingDraftRequest, options?: Parameters<typeof customFetch>[1]): Promise<GradingDraftView> => {
+
+  return customFetch<GradingDraftView>(getCreateGradingDraftUrl(studentId,assignmentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(gradingDraftRequest)
+  }
+);}
+
+
+
+
+
+export const getCreateGradingDraftMutationOptions = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createGradingDraft>>, TError,{studentId: string;assignmentId: string;data: BodyType<GradingDraftRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createGradingDraft>>, TError,{studentId: string;assignmentId: string;data: BodyType<GradingDraftRequest>}, TContext> => {
+
+const mutationKey = ['createGradingDraft'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createGradingDraft>>, {studentId: string;assignmentId: string;data: BodyType<GradingDraftRequest>}> = (props) => {
+          const {studentId,assignmentId,data} = props ?? {};
+
+          return  createGradingDraft(studentId,assignmentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateGradingDraftMutationResult = NonNullable<Awaited<ReturnType<typeof createGradingDraft>>>
+    export type CreateGradingDraftMutationBody = BodyType<GradingDraftRequest>
+    export type CreateGradingDraftMutationError = ErrorType<WorkError>
+
+    export const useCreateGradingDraft = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createGradingDraft>>, TError,{studentId: string;assignmentId: string;data: BodyType<GradingDraftRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createGradingDraft>>,
+        TError,
+        {studentId: string;assignmentId: string;data: BodyType<GradingDraftRequest>},
+        TContext
+      > => {
+      return useMutation(getCreateGradingDraftMutationOptions(options));
+    }
+
+export const getScheduleChildWorkUrl = (studentId: string,) => {
+
+
+
+
+  return `/api/students/${studentId}/work/schedule`
+}
+
+export const scheduleChildWork = async (studentId: string,
+    workScheduleInput: WorkScheduleInput, options?: Parameters<typeof customFetch>[1]): Promise<WorkScheduleResult> => {
+
+  return customFetch<WorkScheduleResult>(getScheduleChildWorkUrl(studentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(workScheduleInput)
+  }
+);}
+
+
+
+
+
+export const getScheduleChildWorkMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduleChildWork>>, TError,{studentId: string;data: BodyType<WorkScheduleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof scheduleChildWork>>, TError,{studentId: string;data: BodyType<WorkScheduleInput>}, TContext> => {
+
+const mutationKey = ['scheduleChildWork'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scheduleChildWork>>, {studentId: string;data: BodyType<WorkScheduleInput>}> = (props) => {
+          const {studentId,data} = props ?? {};
+
+          return  scheduleChildWork(studentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScheduleChildWorkMutationResult = NonNullable<Awaited<ReturnType<typeof scheduleChildWork>>>
+    export type ScheduleChildWorkMutationBody = BodyType<WorkScheduleInput>
+    export type ScheduleChildWorkMutationError = ErrorType<void>
+
+    export const useScheduleChildWork = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduleChildWork>>, TError,{studentId: string;data: BodyType<WorkScheduleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof scheduleChildWork>>,
+        TError,
+        {studentId: string;data: BodyType<WorkScheduleInput>},
+        TContext
+      > => {
+      return useMutation(getScheduleChildWorkMutationOptions(options));
+    }
+
+export const getExportYearPortfolioUrl = (studentId: string,
+    params: ExportYearPortfolioParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/students/${studentId}/work/portfolio?${stringifiedParams}` : `/api/students/${studentId}/work/portfolio`
+}
+
+export const exportYearPortfolio = async (studentId: string,
+    params: ExportYearPortfolioParams, options?: Parameters<typeof customFetch>[1]): Promise<ExportYearPortfolio200> => {
+
+  return customFetch<ExportYearPortfolio200>(getExportYearPortfolioUrl(studentId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getExportYearPortfolioQueryKey = (studentId: string,
+    params?: ExportYearPortfolioParams,) => {
+    return [
+    `/api/students/${studentId}/work/portfolio`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportYearPortfolioQueryOptions = <TData = Awaited<ReturnType<typeof exportYearPortfolio>>, TError = ErrorType<void>>(studentId: string,
+    params: ExportYearPortfolioParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof exportYearPortfolio>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportYearPortfolioQueryKey(studentId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportYearPortfolio>>> = ({ signal }) => exportYearPortfolio(studentId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportYearPortfolio>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ExportYearPortfolioQueryResult = NonNullable<Awaited<ReturnType<typeof exportYearPortfolio>>>
+export type ExportYearPortfolioQueryError = ErrorType<void>
+
+
+
+export function useExportYearPortfolio<TData = Awaited<ReturnType<typeof exportYearPortfolio>>, TError = ErrorType<void>>(
+ studentId: string,
+    params: ExportYearPortfolioParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof exportYearPortfolio>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getExportYearPortfolioQueryOptions(studentId,params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPrivateEvidenceUrl = (studentId: string,
+    assignmentId: string,
+    submissionId: string,
+    index: string,) => {
+
+
+
+
+  return `/api/students/${studentId}/work/${assignmentId}/submissions/${submissionId}/evidence/${index}`
+}
+
+export const getPrivateEvidence = async (studentId: string,
+    assignmentId: string,
+    submissionId: string,
+    index: string, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetPrivateEvidenceUrl(studentId,assignmentId,submissionId,index),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPrivateEvidenceQueryKey = (studentId: string,
+    assignmentId: string,
+    submissionId: string,
+    index: string,) => {
+    return [
+    `/api/students/${studentId}/work/${assignmentId}/submissions/${submissionId}/evidence/${index}`
+    ] as const;
+    }
+
+
+export const getGetPrivateEvidenceQueryOptions = <TData = Awaited<ReturnType<typeof getPrivateEvidence>>, TError = ErrorType<void>>(studentId: string,
+    assignmentId: string,
+    submissionId: string,
+    index: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPrivateEvidence>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPrivateEvidenceQueryKey(studentId,assignmentId,submissionId,index);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPrivateEvidence>>> = ({ signal }) => getPrivateEvidence(studentId,assignmentId,submissionId,index, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined && assignmentId !== null && assignmentId !== undefined && submissionId !== null && submissionId !== undefined && index !== null && index !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPrivateEvidence>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPrivateEvidenceQueryResult = NonNullable<Awaited<ReturnType<typeof getPrivateEvidence>>>
+export type GetPrivateEvidenceQueryError = ErrorType<void>
+
+
+
+export function useGetPrivateEvidence<TData = Awaited<ReturnType<typeof getPrivateEvidence>>, TError = ErrorType<void>>(
+ studentId: string,
+    assignmentId: string,
+    submissionId: string,
+    index: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPrivateEvidence>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPrivateEvidenceQueryOptions(studentId,assignmentId,submissionId,index,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetFamilySessionUrl = () => {
+
+
+
+
+  return `/api/auth/session`
+}
+
+export const getFamilySession = async ( options?: Parameters<typeof customFetch>[1]): Promise<GetFamilySession200> => {
+
+  return customFetch<GetFamilySession200>(getGetFamilySessionUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetFamilySessionQueryKey = () => {
+    return [
+    `/api/auth/session`
+    ] as const;
+    }
+
+
+export const getGetFamilySessionQueryOptions = <TData = Awaited<ReturnType<typeof getFamilySession>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFamilySession>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFamilySessionQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFamilySession>>> = ({ signal }) => getFamilySession({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFamilySession>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetFamilySessionQueryResult = NonNullable<Awaited<ReturnType<typeof getFamilySession>>>
+export type GetFamilySessionQueryError = ErrorType<void>
+
+
+
+export function useGetFamilySession<TData = Awaited<ReturnType<typeof getFamilySession>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFamilySession>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetFamilySessionQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRegisterLocalFamilyUrl = () => {
+
+
+
+
+  return `/api/auth/register`
+}
+
+export const registerLocalFamily = async (registerLocalFamilyBody: RegisterLocalFamilyBody, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getRegisterLocalFamilyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(registerLocalFamilyBody)
+  }
+);}
+
+
+
+
+
+export const getRegisterLocalFamilyMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerLocalFamily>>, TError,{data: BodyType<RegisterLocalFamilyBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof registerLocalFamily>>, TError,{data: BodyType<RegisterLocalFamilyBody>}, TContext> => {
+
+const mutationKey = ['registerLocalFamily'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerLocalFamily>>, {data: BodyType<RegisterLocalFamilyBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  registerLocalFamily(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RegisterLocalFamilyMutationResult = NonNullable<Awaited<ReturnType<typeof registerLocalFamily>>>
+    export type RegisterLocalFamilyMutationBody = BodyType<RegisterLocalFamilyBody>
+    export type RegisterLocalFamilyMutationError = ErrorType<void>
+
+    export const useRegisterLocalFamily = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerLocalFamily>>, TError,{data: BodyType<RegisterLocalFamilyBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof registerLocalFamily>>,
+        TError,
+        {data: BodyType<RegisterLocalFamilyBody>},
+        TContext
+      > => {
+      return useMutation(getRegisterLocalFamilyMutationOptions(options));
+    }
+
+export const getLoginFamilyUrl = () => {
+
+
+
+
+  return `/api/auth/login`
+}
+
+export const loginFamily = async (loginFamilyBody: LoginFamilyBody, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getLoginFamilyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(loginFamilyBody)
+  }
+);}
+
+
+
+
+
+export const getLoginFamilyMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginFamily>>, TError,{data: BodyType<LoginFamilyBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof loginFamily>>, TError,{data: BodyType<LoginFamilyBody>}, TContext> => {
+
+const mutationKey = ['loginFamily'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginFamily>>, {data: BodyType<LoginFamilyBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  loginFamily(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LoginFamilyMutationResult = NonNullable<Awaited<ReturnType<typeof loginFamily>>>
+    export type LoginFamilyMutationBody = BodyType<LoginFamilyBody>
+    export type LoginFamilyMutationError = ErrorType<void>
+
+    export const useLoginFamily = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginFamily>>, TError,{data: BodyType<LoginFamilyBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof loginFamily>>,
+        TError,
+        {data: BodyType<LoginFamilyBody>},
+        TContext
+      > => {
+      return useMutation(getLoginFamilyMutationOptions(options));
+    }
+
+export const getLogoutFamilyUrl = () => {
+
+
+
+
+  return `/api/auth/logout`
+}
+
+export const logoutFamily = async ( options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getLogoutFamilyUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getLogoutFamilyMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutFamily>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof logoutFamily>>, TError,void, TContext> => {
+
+const mutationKey = ['logoutFamily'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logoutFamily>>, void> = () => {
+
+
+          return  logoutFamily(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LogoutFamilyMutationResult = NonNullable<Awaited<ReturnType<typeof logoutFamily>>>
+
+    export type LogoutFamilyMutationError = ErrorType<void>
+
+    export const useLogoutFamily = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutFamily>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof logoutFamily>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getLogoutFamilyMutationOptions(options));
+    }
+
+export const getCreateChildLoginUrl = (studentId: string,) => {
+
+
+
+
+  return `/api/auth/children/${studentId}`
+}
+
+export const createChildLogin = async (studentId: string,
+    createChildLoginBody: CreateChildLoginBody, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getCreateChildLoginUrl(studentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createChildLoginBody)
+  }
+);}
+
+
+
+
+
+export const getCreateChildLoginMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createChildLogin>>, TError,{studentId: string;data: BodyType<CreateChildLoginBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createChildLogin>>, TError,{studentId: string;data: BodyType<CreateChildLoginBody>}, TContext> => {
+
+const mutationKey = ['createChildLogin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createChildLogin>>, {studentId: string;data: BodyType<CreateChildLoginBody>}> = (props) => {
+          const {studentId,data} = props ?? {};
+
+          return  createChildLogin(studentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateChildLoginMutationResult = NonNullable<Awaited<ReturnType<typeof createChildLogin>>>
+    export type CreateChildLoginMutationBody = BodyType<CreateChildLoginBody>
+    export type CreateChildLoginMutationError = ErrorType<void>
+
+    export const useCreateChildLogin = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createChildLogin>>, TError,{studentId: string;data: BodyType<CreateChildLoginBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createChildLogin>>,
+        TError,
+        {studentId: string;data: BodyType<CreateChildLoginBody>},
+        TContext
+      > => {
+      return useMutation(getCreateChildLoginMutationOptions(options));
+    }
+
+export const getChangeFamilyPasswordUrl = () => {
+
+
+
+
+  return `/api/auth/password`
+}
+
+export const changeFamilyPassword = async (changeFamilyPasswordBody: ChangeFamilyPasswordBody, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getChangeFamilyPasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(changeFamilyPasswordBody)
+  }
+);}
+
+
+
+
+
+export const getChangeFamilyPasswordMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeFamilyPassword>>, TError,{data: BodyType<ChangeFamilyPasswordBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof changeFamilyPassword>>, TError,{data: BodyType<ChangeFamilyPasswordBody>}, TContext> => {
+
+const mutationKey = ['changeFamilyPassword'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof changeFamilyPassword>>, {data: BodyType<ChangeFamilyPasswordBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  changeFamilyPassword(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChangeFamilyPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof changeFamilyPassword>>>
+    export type ChangeFamilyPasswordMutationBody = BodyType<ChangeFamilyPasswordBody>
+    export type ChangeFamilyPasswordMutationError = ErrorType<void>
+
+    export const useChangeFamilyPassword = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeFamilyPassword>>, TError,{data: BodyType<ChangeFamilyPasswordBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof changeFamilyPassword>>,
+        TError,
+        {data: BodyType<ChangeFamilyPasswordBody>},
+        TContext
+      > => {
+      return useMutation(getChangeFamilyPasswordMutationOptions(options));
+    }
+
+export const getGetChildWorkUrl = (studentId: string,) => {
+
+
+
+
+  return `/api/students/${studentId}/work`
+}
+
+export const getChildWork = async (studentId: string, options?: Parameters<typeof customFetch>[1]): Promise<ChildWork> => {
+
+  return customFetch<ChildWork>(getGetChildWorkUrl(studentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetChildWorkQueryKey = (studentId: string,) => {
+    return [
+    `/api/students/${studentId}/work`
+    ] as const;
+    }
+
+
+export const getGetChildWorkQueryOptions = <TData = Awaited<ReturnType<typeof getChildWork>>, TError = ErrorType<WorkError>>(studentId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getChildWork>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetChildWorkQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getChildWork>>> = ({ signal }) => getChildWork(studentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getChildWork>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetChildWorkQueryResult = NonNullable<Awaited<ReturnType<typeof getChildWork>>>
+export type GetChildWorkQueryError = ErrorType<WorkError>
+
+
+
+export function useGetChildWork<TData = Awaited<ReturnType<typeof getChildWork>>, TError = ErrorType<WorkError>>(
+ studentId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getChildWork>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetChildWorkQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateWorkAssignmentUrl = (studentId: string,) => {
+
+
+
+
+  return `/api/students/${studentId}/work`
+}
+
+/**
+ * Local synthetic-data only. Real family authentication is unavailable.
+ */
+export const createWorkAssignment = async (studentId: string,
+    workAssignmentInput: WorkAssignmentInput, options?: Parameters<typeof customFetch>[1]): Promise<WorkAssignment> => {
+
+  return customFetch<WorkAssignment>(getCreateWorkAssignmentUrl(studentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(workAssignmentInput)
+  }
+);}
+
+
+
+
+
+export const getCreateWorkAssignmentMutationOptions = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkAssignment>>, TError,{studentId: string;data: BodyType<WorkAssignmentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createWorkAssignment>>, TError,{studentId: string;data: BodyType<WorkAssignmentInput>}, TContext> => {
+
+const mutationKey = ['createWorkAssignment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createWorkAssignment>>, {studentId: string;data: BodyType<WorkAssignmentInput>}> = (props) => {
+          const {studentId,data} = props ?? {};
+
+          return  createWorkAssignment(studentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateWorkAssignmentMutationResult = NonNullable<Awaited<ReturnType<typeof createWorkAssignment>>>
+    export type CreateWorkAssignmentMutationBody = BodyType<WorkAssignmentInput>
+    export type CreateWorkAssignmentMutationError = ErrorType<WorkError>
+
+    export const useCreateWorkAssignment = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkAssignment>>, TError,{studentId: string;data: BodyType<WorkAssignmentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createWorkAssignment>>,
+        TError,
+        {studentId: string;data: BodyType<WorkAssignmentInput>},
+        TContext
+      > => {
+      return useMutation(getCreateWorkAssignmentMutationOptions(options));
+    }
+
+export const getSubmitWorkUrl = (studentId: string,
+    assignmentId: string,) => {
+
+
+
+
+  return `/api/students/${studentId}/work/${assignmentId}/submissions`
+}
+
+/**
+ * Local synthetic-data only. Real family authentication is unavailable.
+ */
+export const submitWork = async (studentId: string,
+    assignmentId: string,
+    workSubmissionInput: WorkSubmissionInput, options?: Parameters<typeof customFetch>[1]): Promise<WorkSubmission> => {
+
+  return customFetch<WorkSubmission>(getSubmitWorkUrl(studentId,assignmentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(workSubmissionInput)
+  }
+);}
+
+
+
+
+
+export const getSubmitWorkMutationOptions = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitWork>>, TError,{studentId: string;assignmentId: string;data: BodyType<WorkSubmissionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitWork>>, TError,{studentId: string;assignmentId: string;data: BodyType<WorkSubmissionInput>}, TContext> => {
+
+const mutationKey = ['submitWork'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitWork>>, {studentId: string;assignmentId: string;data: BodyType<WorkSubmissionInput>}> = (props) => {
+          const {studentId,assignmentId,data} = props ?? {};
+
+          return  submitWork(studentId,assignmentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitWorkMutationResult = NonNullable<Awaited<ReturnType<typeof submitWork>>>
+    export type SubmitWorkMutationBody = BodyType<WorkSubmissionInput>
+    export type SubmitWorkMutationError = ErrorType<WorkError>
+
+    export const useSubmitWork = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitWork>>, TError,{studentId: string;assignmentId: string;data: BodyType<WorkSubmissionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitWork>>,
+        TError,
+        {studentId: string;assignmentId: string;data: BodyType<WorkSubmissionInput>},
+        TContext
+      > => {
+      return useMutation(getSubmitWorkMutationOptions(options));
+    }
+
+export const getReviewWorkUrl = (studentId: string,
+    assignmentId: string,) => {
+
+
+
+
+  return `/api/students/${studentId}/work/${assignmentId}/reviews`
+}
+
+/**
+ * Local synthetic-data only. Real family authentication is unavailable.
+ */
+export const reviewWork = async (studentId: string,
+    assignmentId: string,
+    workReviewInput: WorkReviewInput, options?: Parameters<typeof customFetch>[1]): Promise<WorkReview> => {
+
+  return customFetch<WorkReview>(getReviewWorkUrl(studentId,assignmentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(workReviewInput)
+  }
+);}
+
+
+
+
+
+export const getReviewWorkMutationOptions = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewWork>>, TError,{studentId: string;assignmentId: string;data: BodyType<WorkReviewInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof reviewWork>>, TError,{studentId: string;assignmentId: string;data: BodyType<WorkReviewInput>}, TContext> => {
+
+const mutationKey = ['reviewWork'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviewWork>>, {studentId: string;assignmentId: string;data: BodyType<WorkReviewInput>}> = (props) => {
+          const {studentId,assignmentId,data} = props ?? {};
+
+          return  reviewWork(studentId,assignmentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReviewWorkMutationResult = NonNullable<Awaited<ReturnType<typeof reviewWork>>>
+    export type ReviewWorkMutationBody = BodyType<WorkReviewInput>
+    export type ReviewWorkMutationError = ErrorType<WorkError>
+
+    export const useReviewWork = <TError = ErrorType<WorkError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewWork>>, TError,{studentId: string;assignmentId: string;data: BodyType<WorkReviewInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof reviewWork>>,
+        TError,
+        {studentId: string;assignmentId: string;data: BodyType<WorkReviewInput>},
+        TContext
+      > => {
+      return useMutation(getReviewWorkMutationOptions(options));
+    }
 
 export const getHealthCheckUrl = () => {
 

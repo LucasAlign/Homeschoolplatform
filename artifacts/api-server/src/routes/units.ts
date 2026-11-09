@@ -3,13 +3,13 @@ import { db } from "@workspace/db";
 import { unitsTable, coursesTable } from "@workspace/db";
 import { eq, and, count } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { DEMO_USER_ID, ensureDemoUser } from "../lib/user";
+import { principal } from "../lib/session";
+import { ownsUnit } from "../lib/ownership";
 
 const router = Router();
 
 // Create unit for a course
 router.post("/courses/:id/units", async (req, res): Promise<void> => {
-  await ensureDemoUser();
   const { id: courseId } = req.params;
   const { title } = req.body;
 
@@ -22,7 +22,12 @@ router.post("/courses/:id/units", async (req, res): Promise<void> => {
   const [course] = await db
     .select()
     .from(coursesTable)
-    .where(and(eq(coursesTable.id, courseId), eq(coursesTable.ownerId, DEMO_USER_ID)));
+    .where(
+      and(
+        eq(coursesTable.id, courseId),
+        eq(coursesTable.ownerId, principal(res).ownerId),
+      ),
+    );
 
   if (!course) {
     res.status(404).json({ error: "Course not found" });
@@ -53,8 +58,11 @@ router.post("/courses/:id/units", async (req, res): Promise<void> => {
 
 // Delete unit
 router.delete("/units/:unitId", async (req, res): Promise<void> => {
-  await ensureDemoUser();
   const { unitId } = req.params;
+  if (!(await ownsUnit(unitId, principal(res).ownerId))) {
+    res.status(404).json({ error: "Unit not found" });
+    return;
+  }
 
   await db.delete(unitsTable).where(eq(unitsTable.id, unitId));
   res.sendStatus(204);

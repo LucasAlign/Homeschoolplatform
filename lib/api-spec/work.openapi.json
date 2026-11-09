@@ -1,0 +1,2004 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Child Work",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/students/{studentId}/work": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getChildWork",
+        "tags": [
+          "work"
+        ],
+        "responses": {
+          "200": {
+            "description": "All child work with immutable attempt and review history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildWork"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createWorkAssignment",
+        "tags": [
+          "work"
+        ],
+        "description": "Local synthetic-data only. Real family authentication is unavailable.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkAssignmentInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkAssignment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/{studentId}/work/{assignmentId}/submissions": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "assignmentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "submitWork",
+        "tags": [
+          "work"
+        ],
+        "description": "Local synthetic-data only. Real family authentication is unavailable.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkSubmissionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkSubmission"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/{studentId}/work/{assignmentId}/reviews": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "assignmentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "reviewWork",
+        "tags": [
+          "work"
+        ],
+        "description": "Local synthetic-data only. Real family authentication is unavailable.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkReviewInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkReview"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, conflicting, oversized, or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/{studentId}/work/portfolio": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "exportYearPortfolio",
+        "tags": [
+          "work"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parent-only JSON export with full evidence data URLs, assignments, attempts and reviews for the selected year",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "403": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "404": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          }
+        }
+      }
+    },
+    "/students/{studentId}/work/{assignmentId}/submissions/{submissionId}/evidence/{index}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "assignmentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "submissionId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "index",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getPrivateEvidence",
+        "tags": [
+          "work"
+        ],
+        "responses": {
+          "200": {
+            "description": "Private raster bytes; no-store, nosniff and sandbox headers",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "404": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          }
+        }
+      }
+    },
+    "/students/{studentId}/work/schedule": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "scheduleChildWork",
+        "tags": [
+          "work"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkScheduleInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created or replayed the same schedule without duplicates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkScheduleResult"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created or replayed the same schedule without duplicates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkScheduleResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "401": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "403": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "404": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          },
+          "409": {
+            "description": "Unauthenticated, unauthorized, invalid, or unavailable request"
+          }
+        }
+      }
+    },
+    "/students/{studentId}/work/portfolio/preview": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "previewPrintPortfolio",
+        "tags": [
+          "work"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrintPortfolioInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrintPortfolio"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/{studentId}/work/{assignmentId}/grading-drafts": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "studentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "assignmentId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getGradingDrafts",
+        "tags": [
+          "work"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradingDraftList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createGradingDraft",
+        "tags": [
+          "work"
+        ],
+        "description": "Parent-only synthetic test workflow. Never real AI grading; never finalizes a grade.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradingDraftRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradingDraftView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid, inaccessible, stale, oversized or unavailable request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "WorkAssignmentInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "curriculum": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "textbook",
+              "offline",
+              "website",
+              "custom"
+            ]
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "resourceUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "schoolYear": {
+            "type": "string"
+          },
+          "rubric": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "subject",
+          "curriculum",
+          "sourceType",
+          "instructions",
+          "resourceUrl",
+          "dueDate",
+          "schoolYear",
+          "rubric"
+        ],
+        "additionalProperties": false
+      },
+      "WorkEvidence": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "dataUrl": {
+            "type": "string",
+            "maxLength": 1400000,
+            "description": "PNG/JPEG base64 data URL, maximum decoded size 1 MiB. Synthetic fixtures only."
+          }
+        },
+        "required": [
+          "name",
+          "dataUrl"
+        ],
+        "additionalProperties": false
+      },
+      "WorkSubmissionInput": {
+        "type": "object",
+        "properties": {
+          "notes": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkEvidence"
+            },
+            "maxItems": 2
+          }
+        },
+        "required": [
+          "notes",
+          "evidence"
+        ],
+        "additionalProperties": false
+      },
+      "WorkReviewInput": {
+        "type": "object",
+        "properties": {
+          "submissionId": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "needs_revision"
+            ]
+          },
+          "feedback": {
+            "type": "string"
+          },
+          "score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "gradingDraftId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "draftAction": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "accepted",
+              "overridden",
+              null
+            ]
+          }
+        },
+        "required": [
+          "submissionId",
+          "decision",
+          "feedback",
+          "score"
+        ],
+        "additionalProperties": false
+      },
+      "WorkReview": {
+        "type": "object",
+        "properties": {
+          "submissionId": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "needs_revision"
+            ]
+          },
+          "feedback": {
+            "type": "string"
+          },
+          "score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "id": {
+            "type": "string"
+          },
+          "reviewerId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "gradingDraftId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "draftAction": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "accepted",
+              "overridden",
+              null
+            ]
+          }
+        },
+        "required": [
+          "submissionId",
+          "decision",
+          "feedback",
+          "score",
+          "id",
+          "reviewerId",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "WorkSubmission": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "assignmentId": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkEvidence"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "assignmentId",
+          "notes",
+          "evidence",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "WorkSubmissionWithReviews": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "assignmentId": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkPrivateEvidence"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkReview"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "assignmentId",
+          "notes",
+          "evidence",
+          "createdAt",
+          "reviews"
+        ],
+        "additionalProperties": false
+      },
+      "WorkAssignment": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "curriculum": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "textbook",
+              "offline",
+              "website",
+              "custom"
+            ]
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "resourceUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "schoolYear": {
+            "type": "string"
+          },
+          "rubric": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "studentId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "assigned",
+              "submitted",
+              "needs_revision",
+              "approved"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "title",
+          "subject",
+          "curriculum",
+          "sourceType",
+          "instructions",
+          "resourceUrl",
+          "dueDate",
+          "schoolYear",
+          "rubric",
+          "id",
+          "studentId",
+          "status",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "WorkAssignmentWithHistory": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "curriculum": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "textbook",
+              "offline",
+              "website",
+              "custom"
+            ]
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "resourceUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "schoolYear": {
+            "type": "string"
+          },
+          "rubric": {
+            "type": "string",
+            "description": "Returned to parent sessions only."
+          },
+          "id": {
+            "type": "string"
+          },
+          "studentId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "assigned",
+              "submitted",
+              "needs_revision",
+              "approved"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "submissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkSubmissionWithReviews"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "subject",
+          "curriculum",
+          "sourceType",
+          "instructions",
+          "resourceUrl",
+          "dueDate",
+          "schoolYear",
+          "id",
+          "studentId",
+          "status",
+          "createdAt",
+          "submissions"
+        ],
+        "additionalProperties": false
+      },
+      "ChildWork": {
+        "type": "object",
+        "properties": {
+          "student": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "firstName": {
+                "type": "string"
+              },
+              "preferredName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "firstName",
+              "preferredName"
+            ],
+            "additionalProperties": true
+          },
+          "assignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkAssignmentWithHistory"
+            }
+          },
+          "ai": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "unavailable"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "student",
+          "assignments",
+          "ai"
+        ],
+        "additionalProperties": false
+      },
+      "WorkError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "WorkPrivateEvidence": {
+        "type": "object",
+        "required": [
+          "name",
+          "url"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "description": "Authenticated same-origin evidence endpoint. No public URL."
+          }
+        },
+        "additionalProperties": false
+      },
+      "WorkScheduleInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 180
+          },
+          "subject": {
+            "type": "string"
+          },
+          "curriculum": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "textbook",
+              "offline",
+              "website",
+              "custom"
+            ]
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "resourceUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "schoolYear": {
+            "type": "string"
+          },
+          "rubric": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 60
+          },
+          "weekdays": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 7,
+            "uniqueItems": true,
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            }
+          },
+          "skipDates": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "default": []
+          },
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "title",
+          "subject",
+          "curriculum",
+          "sourceType",
+          "instructions",
+          "resourceUrl",
+          "schoolYear",
+          "rubric",
+          "startDate",
+          "count",
+          "weekdays",
+          "requestId"
+        ],
+        "additionalProperties": false
+      },
+      "WorkScheduleResult": {
+        "type": "object",
+        "properties": {
+          "assignmentIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "assignmentIds"
+        ]
+      },
+      "GradingGrounding": {
+        "type": "object",
+        "required": [
+          "rubricQuote",
+          "evidenceQuote",
+          "explanation"
+        ],
+        "properties": {
+          "rubricQuote": {
+            "type": "string"
+          },
+          "evidenceQuote": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GradingDraftView": {
+        "type": "object",
+        "required": [
+          "id",
+          "submissionId",
+          "sourceHash",
+          "rubricSnapshot",
+          "provider",
+          "status",
+          "simulated",
+          "feedback",
+          "score",
+          "grounding",
+          "reason",
+          "createdBy",
+          "createdAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "submissionId": {
+            "type": "string"
+          },
+          "sourceHash": {
+            "type": "string"
+          },
+          "rubricSnapshot": {
+            "type": "string"
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "simulated",
+              "unavailable",
+              "failed"
+            ]
+          },
+          "simulated": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "feedback": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "grounding": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GradingGrounding"
+            }
+          },
+          "reason": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GradingDraftList": {
+        "type": "object",
+        "required": [
+          "availability",
+          "drafts"
+        ],
+        "properties": {
+          "availability": {
+            "type": "object",
+            "required": [
+              "enabled",
+              "reason"
+            ],
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "drafts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GradingDraftView"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "GradingDraftRequest": {
+        "type": "object",
+        "required": [
+          "submissionId"
+        ],
+        "properties": {
+          "submissionId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrintPortfolioInput": {
+        "type": "object",
+        "required": [
+          "schoolYear",
+          "assignmentIds"
+        ],
+        "properties": {
+          "schoolYear": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "assignmentIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 30,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeEvidence": {
+            "type": "boolean",
+            "default": true
+          },
+          "includeFeedback": {
+            "type": "boolean",
+            "default": true
+          },
+          "includeHistory": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrintEvidence": {
+        "type": "object",
+        "required": [
+          "name",
+          "dataUrl"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "dataUrl": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrintReview": {
+        "type": "object",
+        "required": [
+          "decision",
+          "feedback",
+          "score",
+          "reviewedAt",
+          "provenance"
+        ],
+        "properties": {
+          "decision": {
+            "type": "string"
+          },
+          "feedback": {
+            "type": "string"
+          },
+          "score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "reviewedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "provenance": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrintAttempt": {
+        "type": "object",
+        "required": [
+          "submittedAt",
+          "notes",
+          "evidence",
+          "reviews"
+        ],
+        "properties": {
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintEvidence"
+            }
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintReview"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrintWork": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "subject",
+          "curriculum",
+          "sourceType",
+          "instructions",
+          "dueDate",
+          "status",
+          "attempts"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "curriculum": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string"
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string"
+          },
+          "attempts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintAttempt"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrintPortfolio": {
+        "type": "object",
+        "required": [
+          "title",
+          "schoolYear",
+          "createdAt",
+          "learner",
+          "notice",
+          "options",
+          "summary",
+          "work"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "schoolYear": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "learner": {
+            "type": "object",
+            "required": [
+              "name",
+              "gradeLevel"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "gradeLevel": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "notice": {
+            "type": "string"
+          },
+          "options": {
+            "$ref": "#/components/schemas/PrintPortfolioInput"
+          },
+          "summary": {
+            "type": "object",
+            "required": [
+              "selected",
+              "approved",
+              "awaitingReview",
+              "unfinished",
+              "subjects"
+            ],
+            "properties": {
+              "selected": {
+                "type": "integer"
+              },
+              "approved": {
+                "type": "integer"
+              },
+              "awaitingReview": {
+                "type": "integer"
+              },
+              "unfinished": {
+                "type": "integer"
+              },
+              "subjects": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "work": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintWork"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

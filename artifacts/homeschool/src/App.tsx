@@ -14,6 +14,8 @@ import NotFound from "@/pages/not-found";
 import NewStudentPage from "@/pages/students/new";
 import CurriculumSetupPage from "@/pages/students/curriculum";
 import { ReactNode } from "react";
+import WorkPage from "@/pages/work";
+import { SessionProvider, useSession } from "@/components/session-provider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,20 +27,32 @@ const queryClient = new QueryClient({
 });
 
 function Router() {
+  const { parent } = useSession();
   return (
     <AppLayout>
       <RoutedErrorBoundary>
-        <Switch>
-          <Route path="/" component={DashboardPage} />
-          <Route path="/students/new" component={NewStudentPage} />
-          <Route path="/students/:id/curriculum" component={CurriculumSetupPage} />
-          <Route path="/courses" component={CoursesPage} />
-          <Route path="/courses/new" component={NewCoursePage} />
-          <Route path="/courses/:id" component={CourseDetailPage} />
-          <Route path="/courses/:id/edit" component={EditCoursePage} />
-          <Route path="/courses/:id/lessons/:lessonId" component={LessonEditorPage} />
-          <Route component={NotFound} />
-        </Switch>
+        {parent ? (
+          <Switch>
+            <Route path="/" component={DashboardPage} />
+            <Route path="/work" component={WorkPage} />
+            <Route path="/students/new" component={NewStudentPage} />
+            <Route
+              path="/students/:id/curriculum"
+              component={CurriculumSetupPage}
+            />
+            <Route path="/courses" component={CoursesPage} />
+            <Route path="/courses/new" component={NewCoursePage} />
+            <Route path="/courses/:id" component={CourseDetailPage} />
+            <Route path="/courses/:id/edit" component={EditCoursePage} />
+            <Route
+              path="/courses/:id/lessons/:lessonId"
+              component={LessonEditorPage}
+            />
+            <Route component={NotFound} />
+          </Switch>
+        ) : (
+          <WorkPage />
+        )}
       </RoutedErrorBoundary>
     </AppLayout>
   );
@@ -54,7 +68,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
+          <SessionProvider>
+            <Router />
+          </SessionProvider>
         </WouterRouter>
         <Toaster />
       </TooltipProvider>

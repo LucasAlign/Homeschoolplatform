@@ -17,6 +17,9 @@ export default defineConfig({
   "api-client-react": {
     input: {
       target: "./openapi.yaml",
+      parserOptions: {
+        externalRefs: { allow: ["./work.openapi.json", "./auth.openapi.json"] },
+      },
       override: {
         transformer: titleTransformer,
       },
@@ -43,6 +46,9 @@ export default defineConfig({
   zod: {
     input: {
       target: "./openapi.yaml",
+      parserOptions: {
+        externalRefs: { allow: ["./work.openapi.json", "./auth.openapi.json"] },
+      },
       override: {
         transformer: titleTransformer,
       },
@@ -58,10 +64,10 @@ export default defineConfig({
       override: {
         zod: {
           coerce: {
-            query: ['boolean', 'number', 'string'],
-            param: ['boolean', 'number', 'string'],
-            body: ['bigint', 'date'],
-            response: ['bigint', 'date'],
+            query: ["boolean", "number", "string"],
+            param: ["boolean", "number", "string"],
+            body: ["bigint", "date"],
+            response: ["bigint", "date"],
           },
         },
         useDates: true,

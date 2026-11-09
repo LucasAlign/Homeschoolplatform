@@ -151,3 +151,496 @@ export interface LessonUpdate {
   published?: boolean;
 }
 
+export type WorkAssignmentInputSourceType = typeof WorkAssignmentInputSourceType[keyof typeof WorkAssignmentInputSourceType];
+
+
+export const WorkAssignmentInputSourceType = {
+  textbook: 'textbook',
+  offline: 'offline',
+  website: 'website',
+  custom: 'custom',
+} as const;
+
+export interface WorkAssignmentInput {
+  title: string;
+  subject: string;
+  curriculum: string;
+  sourceType: WorkAssignmentInputSourceType;
+  instructions: string;
+  /** @nullable */
+  resourceUrl: string | null;
+  dueDate: string;
+  schoolYear: string;
+  rubric: string;
+}
+
+export interface WorkEvidence {
+  name: string;
+  /**
+     * PNG/JPEG base64 data URL, maximum decoded size 1 MiB. Synthetic fixtures only.
+     * @maxLength 1400000
+     */
+  dataUrl: string;
+}
+
+export interface WorkSubmissionInput {
+  /** @maxLength 10000 */
+  notes: string;
+  /** @maxItems 2 */
+  evidence: WorkEvidence[];
+}
+
+export type WorkReviewInputDecision = typeof WorkReviewInputDecision[keyof typeof WorkReviewInputDecision];
+
+
+export const WorkReviewInputDecision = {
+  approved: 'approved',
+  needs_revision: 'needs_revision',
+} as const;
+
+/**
+ * @nullable
+ */
+export type WorkReviewInputDraftAction = typeof WorkReviewInputDraftAction[keyof typeof WorkReviewInputDraftAction] | null;
+
+
+export const WorkReviewInputDraftAction = {
+  accepted: 'accepted',
+  overridden: 'overridden',
+} as const;
+
+export interface WorkReviewInput {
+  submissionId: string;
+  decision: WorkReviewInputDecision;
+  feedback: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  score: number | null;
+  /** @nullable */
+  gradingDraftId?: string | null;
+  /** @nullable */
+  draftAction?: WorkReviewInputDraftAction;
+}
+
+export type WorkReviewDecision = typeof WorkReviewDecision[keyof typeof WorkReviewDecision];
+
+
+export const WorkReviewDecision = {
+  approved: 'approved',
+  needs_revision: 'needs_revision',
+} as const;
+
+/**
+ * @nullable
+ */
+export type WorkReviewDraftAction = typeof WorkReviewDraftAction[keyof typeof WorkReviewDraftAction] | null;
+
+
+export const WorkReviewDraftAction = {
+  accepted: 'accepted',
+  overridden: 'overridden',
+} as const;
+
+export interface WorkReview {
+  submissionId: string;
+  decision: WorkReviewDecision;
+  feedback: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  score: number | null;
+  id: string;
+  reviewerId: string;
+  createdAt: string;
+  /** @nullable */
+  gradingDraftId?: string | null;
+  /** @nullable */
+  draftAction?: WorkReviewDraftAction;
+}
+
+export interface WorkSubmission {
+  id: string;
+  assignmentId: string;
+  notes: string;
+  evidence: WorkEvidence[];
+  createdAt: string;
+}
+
+export interface WorkPrivateEvidence {
+  name: string;
+  /** Authenticated same-origin evidence endpoint. No public URL. */
+  url: string;
+}
+
+export interface WorkSubmissionWithReviews {
+  id: string;
+  assignmentId: string;
+  notes: string;
+  evidence: WorkPrivateEvidence[];
+  createdAt: string;
+  reviews: WorkReview[];
+}
+
+export type WorkAssignmentSourceType = typeof WorkAssignmentSourceType[keyof typeof WorkAssignmentSourceType];
+
+
+export const WorkAssignmentSourceType = {
+  textbook: 'textbook',
+  offline: 'offline',
+  website: 'website',
+  custom: 'custom',
+} as const;
+
+export type WorkAssignmentStatus = typeof WorkAssignmentStatus[keyof typeof WorkAssignmentStatus];
+
+
+export const WorkAssignmentStatus = {
+  assigned: 'assigned',
+  submitted: 'submitted',
+  needs_revision: 'needs_revision',
+  approved: 'approved',
+} as const;
+
+export interface WorkAssignment {
+  title: string;
+  subject: string;
+  curriculum: string;
+  sourceType: WorkAssignmentSourceType;
+  instructions: string;
+  /** @nullable */
+  resourceUrl: string | null;
+  dueDate: string;
+  schoolYear: string;
+  rubric: string;
+  id: string;
+  studentId: string;
+  status: WorkAssignmentStatus;
+  createdAt: string;
+}
+
+export type WorkAssignmentWithHistorySourceType = typeof WorkAssignmentWithHistorySourceType[keyof typeof WorkAssignmentWithHistorySourceType];
+
+
+export const WorkAssignmentWithHistorySourceType = {
+  textbook: 'textbook',
+  offline: 'offline',
+  website: 'website',
+  custom: 'custom',
+} as const;
+
+export type WorkAssignmentWithHistoryStatus = typeof WorkAssignmentWithHistoryStatus[keyof typeof WorkAssignmentWithHistoryStatus];
+
+
+export const WorkAssignmentWithHistoryStatus = {
+  assigned: 'assigned',
+  submitted: 'submitted',
+  needs_revision: 'needs_revision',
+  approved: 'approved',
+} as const;
+
+export interface WorkAssignmentWithHistory {
+  title: string;
+  subject: string;
+  curriculum: string;
+  sourceType: WorkAssignmentWithHistorySourceType;
+  instructions: string;
+  /** @nullable */
+  resourceUrl: string | null;
+  dueDate: string;
+  schoolYear: string;
+  /** Returned to parent sessions only. */
+  rubric?: string;
+  id: string;
+  studentId: string;
+  status: WorkAssignmentWithHistoryStatus;
+  createdAt: string;
+  submissions: WorkSubmissionWithReviews[];
+}
+
+export type ChildWorkStudent = {
+  id: string;
+  firstName: string;
+  /** @nullable */
+  preferredName: string | null;
+  [key: string]: unknown;
+ };
+
+export type ChildWorkAiStatus = typeof ChildWorkAiStatus[keyof typeof ChildWorkAiStatus];
+
+
+export const ChildWorkAiStatus = {
+  unavailable: 'unavailable',
+} as const;
+
+export type ChildWorkAi = {
+  status: ChildWorkAiStatus;
+  reason: string;
+};
+
+export interface ChildWork {
+  student: ChildWorkStudent;
+  assignments: WorkAssignmentWithHistory[];
+  ai: ChildWorkAi;
+}
+
+export interface WorkError {
+  error: string;
+}
+
+export type WorkScheduleInputSourceType = typeof WorkScheduleInputSourceType[keyof typeof WorkScheduleInputSourceType];
+
+
+export const WorkScheduleInputSourceType = {
+  textbook: 'textbook',
+  offline: 'offline',
+  website: 'website',
+  custom: 'custom',
+} as const;
+
+export interface WorkScheduleInput {
+  /** @maxLength 180 */
+  title: string;
+  subject: string;
+  curriculum: string;
+  sourceType: WorkScheduleInputSourceType;
+  instructions: string;
+  /** @nullable */
+  resourceUrl: string | null;
+  schoolYear: string;
+  rubric: string;
+  startDate: string;
+  /**
+     * @minimum 1
+     * @maximum 60
+     */
+  count: number;
+  /**
+     * @minItems 1
+     * @maxItems 7
+     * @items.minimum 0
+     * @items.maximum 6
+     */
+  weekdays: number[];
+  /** @maxItems 100 */
+  skipDates?: string[];
+  requestId: string;
+}
+
+export interface WorkScheduleResult {
+  assignmentIds: string[];
+}
+
+export interface GradingGrounding {
+  rubricQuote: string;
+  evidenceQuote: string;
+  explanation: string;
+}
+
+export type GradingDraftViewStatus = typeof GradingDraftViewStatus[keyof typeof GradingDraftViewStatus];
+
+
+export const GradingDraftViewStatus = {
+  simulated: 'simulated',
+  unavailable: 'unavailable',
+  failed: 'failed',
+} as const;
+
+export interface GradingDraftView {
+  id: string;
+  submissionId: string;
+  sourceHash: string;
+  rubricSnapshot: string;
+  /** @nullable */
+  provider: string | null;
+  status: GradingDraftViewStatus;
+  simulated: true;
+  /** @nullable */
+  feedback: string | null;
+  /**
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  score: number | null;
+  grounding: GradingGrounding[];
+  reason: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+export type GradingDraftListAvailability = {
+  enabled: boolean;
+  reason: string;
+};
+
+export interface GradingDraftList {
+  availability: GradingDraftListAvailability;
+  drafts: GradingDraftView[];
+}
+
+export interface GradingDraftRequest {
+  submissionId: string;
+}
+
+export interface PrintPortfolioInput {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  schoolYear: string;
+  /**
+     * @minItems 1
+     * @maxItems 30
+     */
+  assignmentIds: string[];
+  includeEvidence?: boolean;
+  includeFeedback?: boolean;
+  includeHistory?: boolean;
+}
+
+export interface PrintEvidence {
+  name: string;
+  dataUrl: string;
+}
+
+export interface PrintReview {
+  decision: string;
+  feedback: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  score: number | null;
+  reviewedAt: string;
+  provenance: string;
+}
+
+export interface PrintAttempt {
+  submittedAt: string;
+  notes: string;
+  evidence: PrintEvidence[];
+  reviews: PrintReview[];
+}
+
+export interface PrintWork {
+  id: string;
+  title: string;
+  subject: string;
+  curriculum: string;
+  sourceType: string;
+  instructions: string;
+  dueDate: string;
+  status: string;
+  attempts: PrintAttempt[];
+}
+
+export type PrintPortfolioLearner = {
+  name: string;
+  gradeLevel: string;
+};
+
+export type PrintPortfolioSummary = {
+  selected: number;
+  approved: number;
+  awaitingReview: number;
+  unfinished: number;
+  subjects: string[];
+};
+
+export interface PrintPortfolio {
+  title: string;
+  schoolYear: string;
+  createdAt: string;
+  learner: PrintPortfolioLearner;
+  notice: string;
+  options: PrintPortfolioInput;
+  summary: PrintPortfolioSummary;
+  work: PrintWork[];
+}
+
+export type ExportYearPortfolioParams = {
+/**
+ * @maxLength 200
+ */
+year: string;
+};
+
+export type ExportYearPortfolio200 = { [key: string]: unknown };
+
+/**
+ * @nullable
+ */
+export type GetFamilySession200User = { [key: string]: unknown } | null;
+
+export type GetFamilySession200 = {
+  mode: string;
+  /** @nullable */
+  user: GetFamilySession200User;
+  /** @nullable */
+  csrfToken: string | null;
+  allowSignup: boolean;
+};
+
+export type RegisterLocalFamilyBody = {
+  /**
+     * @minLength 3
+     * @maxLength 64
+     */
+  username: string;
+  /**
+     * @minLength 15
+     * @maxLength 128
+     */
+  password: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  name: string;
+};
+
+export type LoginFamilyBody = {
+  /**
+     * @minLength 3
+     * @maxLength 64
+     */
+  username: string;
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
+  password: string;
+};
+
+export type CreateChildLoginBody = {
+  /**
+     * @minLength 3
+     * @maxLength 64
+     */
+  username: string;
+  /**
+     * @minLength 15
+     * @maxLength 128
+     */
+  password: string;
+};
+
+export type ChangeFamilyPasswordBody = {
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
+  currentPassword: string;
+  /**
+     * @minLength 15
+     * @maxLength 128
+     */
+  newPassword: string;
+};
+

@@ -3,18 +3,16 @@ import { db } from "@workspace/db";
 import { coursesTable, unitsTable, lessonsTable } from "@workspace/db";
 import { eq, desc, count, and, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { DEMO_USER_ID, ensureDemoUser } from "../lib/user";
+import { principal } from "../lib/session";
 
 const router = Router();
 
 // List courses
 router.get("/courses", async (req, res): Promise<void> => {
-  await ensureDemoUser();
-
   const courses = await db
     .select()
     .from(coursesTable)
-    .where(eq(coursesTable.ownerId, DEMO_USER_ID))
+    .where(eq(coursesTable.ownerId, principal(res).ownerId))
     .orderBy(desc(coursesTable.createdAt));
 
   const unitCounts = await db
@@ -28,8 +26,12 @@ router.get("/courses", async (req, res): Promise<void> => {
     .innerJoin(unitsTable, eq(lessonsTable.unitId, unitsTable.id))
     .groupBy(unitsTable.courseId);
 
-  const unitCountMap = Object.fromEntries(unitCounts.map((u) => [u.courseId, Number(u.count)]));
-  const lessonCountMap = Object.fromEntries(lessonCounts.map((l) => [l.courseId, Number(l.count)]));
+  const unitCountMap = Object.fromEntries(
+    unitCounts.map((u) => [u.courseId, Number(u.count)]),
+  );
+  const lessonCountMap = Object.fromEntries(
+    lessonCounts.map((l) => [l.courseId, Number(l.count)]),
+  );
 
   res.json(
     courses.map((c) => ({
@@ -47,7 +49,6 @@ router.get("/courses", async (req, res): Promise<void> => {
 
 // Create course
 router.post("/courses", async (req, res): Promise<void> => {
-  await ensureDemoUser();
   const { title, description, subject, gradeLevel } = req.body;
 
   if (!title) {
@@ -64,7 +65,7 @@ router.post("/courses", async (req, res): Promise<void> => {
       subject: subject ? String(subject).trim() || null : null,
       gradeLevel: gradeLevel ? String(gradeLevel).trim() || null : null,
       published: false,
-      ownerId: DEMO_USER_ID,
+      ownerId: principal(res).ownerId,
     })
     .returning();
 
@@ -80,13 +81,17 @@ router.post("/courses", async (req, res): Promise<void> => {
 
 // Get course detail
 router.get("/courses/:id", async (req, res): Promise<void> => {
-  await ensureDemoUser();
   const { id } = req.params;
 
   const [course] = await db
     .select()
     .from(coursesTable)
-    .where(and(eq(coursesTable.id, id), eq(coursesTable.ownerId, DEMO_USER_ID)));
+    .where(
+      and(
+        eq(coursesTable.id, id),
+        eq(coursesTable.ownerId, principal(res).ownerId),
+      ),
+    );
 
   if (!course) {
     res.status(404).json({ error: "Course not found" });
@@ -128,8 +133,14 @@ router.get("/courses/:id", async (req, res): Promise<void> => {
       updatedAt: u.updatedAt.toISOString(),
       lessons: (lessonsByUnit[u.id] ?? []).map((l) => ({
         ...l,
-        createdAt: (l.createdAt as any) instanceof Date ? (l.createdAt as any).toISOString() : l.createdAt,
-        updatedAt: (l.updatedAt as any) instanceof Date ? (l.updatedAt as any).toISOString() : l.updatedAt,
+        createdAt:
+          (l.createdAt as any) instanceof Date
+            ? (l.createdAt as any).toISOString()
+            : l.createdAt,
+        updatedAt:
+          (l.updatedAt as any) instanceof Date
+            ? (l.updatedAt as any).toISOString()
+            : l.updatedAt,
       })),
     })),
   });
@@ -137,14 +148,18 @@ router.get("/courses/:id", async (req, res): Promise<void> => {
 
 // Update course
 router.patch("/courses/:id", async (req, res): Promise<void> => {
-  await ensureDemoUser();
   const { id } = req.params;
   const { title, description, subject, gradeLevel } = req.body;
 
   const [existing] = await db
     .select()
     .from(coursesTable)
-    .where(and(eq(coursesTable.id, id), eq(coursesTable.ownerId, DEMO_USER_ID)));
+    .where(
+      and(
+        eq(coursesTable.id, id),
+        eq(coursesTable.ownerId, principal(res).ownerId),
+      ),
+    );
 
   if (!existing) {
     res.status(404).json({ error: "Course not found" });
@@ -155,9 +170,19 @@ router.patch("/courses/:id", async (req, res): Promise<void> => {
     .update(coursesTable)
     .set({
       ...(title !== undefined ? { title: String(title).trim() } : {}),
-      ...(description !== undefined ? { description: description ? String(description).trim() || null : null } : {}),
-      ...(subject !== undefined ? { subject: subject ? String(subject).trim() || null : null } : {}),
-      ...(gradeLevel !== undefined ? { gradeLevel: gradeLevel ? String(gradeLevel).trim() || null : null } : {}),
+      ...(description !== undefined
+        ? {
+            description: description
+              ? String(description).trim() || null
+              : null,
+          }
+        : {}),
+      ...(subject !== undefined
+        ? { subject: subject ? String(subject).trim() || null : null }
+        : {}),
+      ...(gradeLevel !== undefined
+        ? { gradeLevel: gradeLevel ? String(gradeLevel).trim() || null : null }
+        : {}),
       updatedAt: new Date(),
     })
     .where(eq(coursesTable.id, id))
@@ -175,13 +200,17 @@ router.patch("/courses/:id", async (req, res): Promise<void> => {
 
 // Delete course
 router.delete("/courses/:id", async (req, res): Promise<void> => {
-  await ensureDemoUser();
   const { id } = req.params;
 
   const [existing] = await db
     .select()
     .from(coursesTable)
-    .where(and(eq(coursesTable.id, id), eq(coursesTable.ownerId, DEMO_USER_ID)));
+    .where(
+      and(
+        eq(coursesTable.id, id),
+        eq(coursesTable.ownerId, principal(res).ownerId),
+      ),
+    );
 
   if (!existing) {
     res.status(404).json({ error: "Course not found" });
@@ -194,14 +223,18 @@ router.delete("/courses/:id", async (req, res): Promise<void> => {
 
 // Toggle published
 router.patch("/courses/:id/publish", async (req, res): Promise<void> => {
-  await ensureDemoUser();
   const { id } = req.params;
   const { published } = req.body;
 
   const [updated] = await db
     .update(coursesTable)
     .set({ published: Boolean(published), updatedAt: new Date() })
-    .where(and(eq(coursesTable.id, id), eq(coursesTable.ownerId, DEMO_USER_ID)))
+    .where(
+      and(
+        eq(coursesTable.id, id),
+        eq(coursesTable.ownerId, principal(res).ownerId),
+      ),
+    )
     .returning();
 
   if (!updated) {

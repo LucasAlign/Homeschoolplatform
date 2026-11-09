@@ -1,0 +1,763 @@
+import { useEffect, useState, useRef, type FormEvent } from "react";
+import { Link } from "wouter";
+import { useSession } from "@/components/session-provider";
+import type {
+  ChildWork as Work,
+  WorkAssignmentWithHistory as Assignment,
+  GradingDraftView,
+  PrintPortfolio,
+} from "@workspace/api-client-react";
+import { GradingDrafts } from "@/components/grading-drafts";
+import {
+  PortfolioBuilder,
+  PortfolioPreview,
+} from "@/components/portfolio-builder";
+
+type Student = { id: string; firstName: string; preferredName: string | null };
+const field = "block w-full border border-gray-400 rounded p-2 mt-1 bg-white";
+const button =
+  "border border-black rounded px-4 py-2 disabled:opacity-40 hover:bg-gray-100";
+const today = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+async function api<T>(path: string, body?: unknown): Promise<T> {
+  const response = await fetch(
+    `/api${path}`,
+    body === undefined
+      ? undefined
+      : {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        },
+  );
+  const data = await response.json();
+  if (!response.ok)
+    throw new Error(data.error || "Request failed. Please retry.");
+  return data;
+}
+
+export default function WorkPage() {
+  const { parent, mode } = useSession();
+  const scheduleRequest = useRef(crypto.randomUUID());
+  const [students, setStudents] = useState<Student[]>([]);
+  const [studentId, setStudentId] = useState("");
+  const [work, setWork] = useState<Work | null>(null);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [filter, setFilter] = useState("due");
+  const [year, setYear] = useState("");
+  const [printPreview, setPrintPreview] = useState<PrintPortfolio | null>(null);
+  useEffect(() => {
+    api<Student[]>("/students")
+      .then((data) => {
+        setStudents(data);
+        setStudentId(data[0]?.id ?? "");
+      })
+      .catch((e) => setError(e.message));
+  }, []);
+  useEffect(() => {
+    let active = true;
+    setWork(null);
+    setError("");
+    if (studentId)
+      api<Work>(`/students/${studentId}/work`)
+        .then((data) => {
+          if (active) setWork(data);
+        })
+        .catch((e) => {
+          if (active) setError(e.message);
+        });
+    return () => {
+      active = false;
+    };
+  }, [studentId]);
+  async function save(path: string, body: unknown) {
+    setBusy(true);
+    setError("");
+    try {
+      await api(path, body);
+      setWork(await api<Work>(`/students/${studentId}/work`));
+      return true;
+    } catch (e) {
+      setError((e as Error).message);
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function create(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const values = Object.fromEntries(formData);
+    const count = Number(values.repeatCount);
+    const skipDates = String(values.skipDates || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    delete values.repeatCount;
+    delete values.skipDates;
+    delete values.weekdays;
+    if (count > 1) {
+      const dueDate = values.dueDate;
+      delete values.dueDate;
+      if (
+        await save(`/students/${studentId}/work/schedule`, {
+          ...values,
+          resourceUrl: values.resourceUrl || null,
+          startDate: dueDate,
+          count,
+          weekdays: formData.getAll("weekdays").map(Number),
+          skipDates,
+          requestId: scheduleRequest.current,
+        })
+      ) {
+        form.reset();
+        scheduleRequest.current = crypto.randomUUID();
+      }
+      return;
+    }
+    if (
+      await save(`/students/${studentId}/work`, {
+        ...values,
+        resourceUrl: values.resourceUrl || null,
+      })
+    )
+      form.reset();
+  }
+  async function exportPortfolio() {
+    if (!work || !year) return;
+    setBusy(true);
+    setError("");
+    try {
+      const portfolio = await api(
+        `/students/${studentId}/work/portfolio?year=${encodeURIComponent(year)}`,
+      );
+      const file = new Blob([JSON.stringify(portfolio, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(file);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `portfolio-${studentId}-${year.replace(/[^a-zA-Z0-9-]/g, "_")}.json`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  if (parent && printPreview)
+    return (
+      <PortfolioPreview
+        report={printPreview}
+        onClose={() => setPrintPreview(null)}
+      />
+    );
+  const shown =
+    work?.assignments.filter(
+      (a) =>
+        filter === "all" ||
+        (filter === "review"
+          ? a.status === "submitted"
+          : a.dueDate <= today() &&
+            ["assigned", "needs_revision"].includes(a.status)),
+    ) ?? [];
+  return (
+    <div className="p-6 md:p-10 space-y-6 max-w-6xl w-full mx-auto">
+      <h1 className="text-3xl font-bold">Each child's learning day</h1>
+      <p
+        role="note"
+        className="p-4 bg-amber-50 border border-amber-300 rounded"
+      >
+        Local synthetic-data workspace. Use fictional children and sample images
+        only. Production access and real student data are not enabled.
+      </p>
+      {error && (
+        <p role="alert" className="p-4 border border-red-500 text-red-800">
+          {error}
+        </p>
+      )}
+      <div className="flex flex-wrap items-end gap-4">
+        <label>
+          Child
+          <select
+            aria-label="Child"
+            className={field}
+            value={studentId}
+            disabled={busy}
+            onChange={(e) => {
+              setStudentId(e.target.value);
+              setYear("");
+            }}
+          >
+            {students.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.preferredName || s.firstName}
+              </option>
+            ))}
+          </select>
+        </label>
+        {parent && (
+          <Link className={button} href="/students/new">
+            Add fictional learner
+          </Link>
+        )}
+      </div>
+      {!students.length && !error && <p>Add a fictional learner to begin.</p>}
+      {studentId && !work && !error && (
+        <p role="status">Loading assignments...</p>
+      )}
+      {work && (
+        <>
+          {parent && (
+            <PortfolioBuilder
+              key={studentId}
+              studentId={studentId}
+              assignments={work.assignments}
+              onPreview={setPrintPreview}
+            />
+          )}
+          {parent && (
+            <details className="border rounded p-4">
+              <summary className="font-semibold cursor-pointer">
+                Plan an assignment
+              </summary>
+              <form
+                onSubmit={create}
+                onChange={() => {
+                  scheduleRequest.current = crypto.randomUUID();
+                }}
+                className="grid md:grid-cols-2 gap-4 mt-4"
+              >
+                {[
+                  ["title", "Assignment title"],
+                  ["subject", "Subject"],
+                  ["curriculum", "Curriculum or book"],
+                  ["schoolYear", "School year"],
+                ].map(([name, label]) => (
+                  <label key={name}>
+                    {label}
+                    <input
+                      name={name}
+                      required
+                      maxLength={200}
+                      className={field}
+                      placeholder={
+                        name === "schoolYear" ? "2026-27" : undefined
+                      }
+                    />
+                  </label>
+                ))}
+                <label>
+                  Source
+                  <select
+                    aria-label="Source"
+                    name="sourceType"
+                    className={field}
+                  >
+                    {["textbook", "offline", "website", "custom"].map((s) => (
+                      <option key={s}>{s}</option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Due date
+                  <input
+                    type="date"
+                    name="dueDate"
+                    defaultValue={today()}
+                    required
+                    className={field}
+                  />
+                </label>
+                <label className="md:col-span-2">
+                  Website link (optional)
+                  <input
+                    type="url"
+                    name="resourceUrl"
+                    placeholder="https://"
+                    maxLength={2000}
+                    className={field}
+                  />
+                </label>
+                <label>
+                  Instructions / pages / activity
+                  <textarea
+                    name="instructions"
+                    required
+                    maxLength={10000}
+                    className={field}
+                  />
+                </label>
+                <label>
+                  Rubric or answer key for parent review
+                  <textarea
+                    name="rubric"
+                    required
+                    maxLength={10000}
+                    className={field}
+                  />
+                </label>
+                <label>
+                  Number of lessons
+                  <input
+                    name="repeatCount"
+                    type="number"
+                    min={1}
+                    max={60}
+                    defaultValue={1}
+                    required
+                    className={field}
+                  />
+                </label>
+                <fieldset>
+                  <legend>Learning weekdays (for repeated lessons)</legend>
+                  <div className="flex flex-wrap gap-3">
+                    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                      (day, i) => (
+                        <label key={day}>
+                          <input
+                            type="checkbox"
+                            name="weekdays"
+                            value={i}
+                            defaultChecked={i > 0 && i < 6}
+                          />{" "}
+                          {day}
+                        </label>
+                      ),
+                    )}
+                  </div>
+                </fieldset>
+                <label className="md:col-span-2">
+                  Dates to skip (YYYY-MM-DD, comma separated)
+                  <input
+                    name="skipDates"
+                    className={field}
+                    placeholder="2026-12-25, 2027-01-01"
+                  />
+                </label>
+                <p className="text-sm md:col-span-2">
+                  Repeated lessons share these instructions and rubric. Each
+                  gets its own due date and submission history.
+                </p>
+                <button disabled={busy} className={button}>
+                  Save assignment
+                </button>
+              </form>
+            </details>
+          )}
+          {parent && mode === "family" && (
+            <details className="border rounded p-4">
+              <summary>Create this child's login</summary>
+              <form
+                className="space-y-3 mt-4"
+                onSubmit={async (event) => {
+                  event.preventDefault();
+                  const form = event.currentTarget;
+                  setBusy(true);
+                  setError("");
+                  try {
+                    await api(
+                      `/auth/children/${studentId}`,
+                      Object.fromEntries(new FormData(form)),
+                    );
+                    form.reset();
+                    setError(
+                      "Child login created. Sign out to use the child account.",
+                    );
+                  } catch (e) {
+                    setError((e as Error).message);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                <label className="block">
+                  Child username
+                  <input
+                    className={field}
+                    name="username"
+                    required
+                    minLength={3}
+                    maxLength={64}
+                    autoComplete="off"
+                  />
+                </label>
+                <label className="block">
+                  Child password (15+ characters)
+                  <input
+                    className={field}
+                    name="password"
+                    type="password"
+                    required
+                    minLength={15}
+                    maxLength={128}
+                    autoComplete="new-password"
+                  />
+                </label>
+                <button className={button} disabled={busy}>
+                  Create child login
+                </button>
+              </form>
+            </details>
+          )}
+          <p className="text-sm text-gray-600">
+            AI grading unavailable: {work.ai.reason}
+          </p>
+          <div className="flex flex-wrap gap-4 items-end">
+            <label>
+              Show
+              <select
+                aria-label="Show"
+                className={field}
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+              >
+                <option value="due">Due today and overdue</option>
+                <option value="review">Awaiting parent review</option>
+                <option value="all">All work and portfolio</option>
+              </select>
+            </label>
+            {parent && (
+              <>
+                <label>
+                  Portfolio school year
+                  <select
+                    aria-label="Portfolio school year"
+                    className={field}
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                  >
+                    <option value="">Choose year</option>
+                    {[...new Set(work.assignments.map((a) => a.schoolYear))]
+                      .sort()
+                      .map((y) => (
+                        <option key={y}>{y}</option>
+                      ))}
+                  </select>
+                </label>
+                <button
+                  className={button}
+                  disabled={!year || busy}
+                  onClick={exportPortfolio}
+                >
+                  Download year portfolio
+                </button>
+              </>
+            )}
+          </div>
+          {parent && (
+            <p className="text-sm">
+              The portfolio includes every assignment, image, submission
+              attempt, and parent review for the selected year, including
+              unfinished work.
+            </p>
+          )}
+          {!shown.length && (
+            <p className="border rounded p-6">No assignments in this view.</p>
+          )}
+          {shown.map((a) => (
+            <AssignmentCard
+              key={a.id}
+              assignment={a}
+              studentId={studentId}
+              busy={busy}
+              save={save}
+              setReadingBusy={setBusy}
+            />
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+function AssignmentCard({
+  assignment: a,
+  studentId,
+  busy,
+  save,
+  setReadingBusy,
+}: {
+  assignment: Assignment;
+  studentId: string;
+  busy: boolean;
+  save: (path: string, body: unknown) => Promise<boolean>;
+  setReadingBusy: (value: boolean) => void;
+}) {
+  const { parent } = useSession();
+  const [fileError, setFileError] = useState("");
+  const [reading, setReading] = useState(false);
+  const latest = a.submissions.at(-1);
+  const reviewForm = useRef<HTMLFormElement>(null);
+  const reviewDetails = useRef<HTMLDetailsElement>(null);
+  const [reviewDraft, setReviewDraft] = useState<GradingDraftView | null>(null);
+  const [draftAction, setDraftAction] = useState<"accepted" | "overridden">(
+    "accepted",
+  );
+  useEffect(() => {
+    setReviewDraft(null);
+    reviewForm.current?.reset();
+  }, [latest?.id]);
+  function applyDraft(draft: GradingDraftView) {
+    setReviewDraft(draft);
+    setDraftAction("accepted");
+    const feedback = reviewForm.current?.elements.namedItem(
+      "feedback",
+    ) as HTMLTextAreaElement | null;
+    const score = reviewForm.current?.elements.namedItem(
+      "score",
+    ) as HTMLInputElement | null;
+    if (feedback) feedback.value = draft.feedback ?? "";
+    if (score) score.value = draft.score === null ? "" : String(draft.score);
+    if (reviewDetails.current) reviewDetails.current.open = true;
+  }
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    setFileError("");
+    setReading(true);
+    setReadingBusy(true);
+    try {
+      const files = data
+        .getAll("images")
+        .filter((v): v is File => v instanceof File && v.size > 0);
+      if (
+        files.length > 2 ||
+        files.some(
+          (f) =>
+            f.size > 1024 * 1024 ||
+            !["image/png", "image/jpeg"].includes(f.type),
+        )
+      )
+        throw new Error("Choose up to two PNG/JPEG images, at most 1 MB each.");
+      const evidence = await Promise.all(
+        files.map(
+          (file) =>
+            new Promise<{ name: string; dataUrl: string }>(
+              (resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () =>
+                  resolve({ name: file.name, dataUrl: String(reader.result) });
+                reader.onerror = () =>
+                  reject(new Error("Could not read image"));
+                reader.readAsDataURL(file);
+              },
+            ),
+        ),
+      );
+      if (
+        await save(`/students/${studentId}/work/${a.id}/submissions`, {
+          notes: data.get("notes"),
+          evidence,
+        })
+      )
+        form.reset();
+    } catch (e) {
+      setFileError((e as Error).message);
+    } finally {
+      setReading(false);
+      setReadingBusy(false);
+    }
+  }
+  async function review(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    if (
+      await save(`/students/${studentId}/work/${a.id}/reviews`, {
+        submissionId: latest?.id,
+        decision: data.get("decision"),
+        feedback: data.get("feedback"),
+        score: data.get("score") === "" ? null : Number(data.get("score")),
+        gradingDraftId: reviewDraft?.id ?? null,
+        draftAction: reviewDraft ? draftAction : null,
+      })
+    ) {
+      form.reset();
+      setReviewDraft(null);
+    }
+  }
+  return (
+    <article className="border rounded-lg p-5 space-y-4">
+      <div>
+        <h2 className="text-xl font-semibold">{a.title}</h2>
+        <p>
+          {a.subject} · {a.curriculum} · {a.sourceType}
+        </p>
+        <p className="text-sm">
+          Due {a.dueDate} · {a.status.replaceAll("_", " ")}
+          {a.dueDate < today() &&
+          ["assigned", "needs_revision"].includes(a.status)
+            ? " · Overdue"
+            : ""}
+        </p>
+      </div>
+      <p className="whitespace-pre-wrap">{a.instructions}</p>
+      {a.resourceUrl && (
+        <a
+          className="underline"
+          href={a.resourceUrl}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Open learning resource
+        </a>
+      )}
+      {parent && (
+        <details>
+          <summary>Rubric / answer key (parent workspace)</summary>
+          <p className="whitespace-pre-wrap mt-2">{a.rubric}</p>
+        </details>
+      )}
+      {a.submissions.map((s, i) => (
+        <div key={s.id} className="border-t pt-3 space-y-2">
+          <h3 className="font-semibold">
+            Attempt {i + 1} · {new Date(s.createdAt).toLocaleString()}
+          </h3>
+          <p className="whitespace-pre-wrap">{s.notes}</p>
+          <div className="flex flex-wrap gap-4">
+            {s.evidence.map((e, j) => (
+              <figure key={j}>
+                <img src={e.url} alt={e.name} className="max-h-60 max-w-full" />
+                <figcaption className="text-sm">{e.name}</figcaption>
+              </figure>
+            ))}
+          </div>
+          {s.reviews.map((r) => (
+            <p key={r.id} className="whitespace-pre-wrap bg-gray-50 p-3">
+              Parent: {r.decision.replaceAll("_", " ")}
+              {r.score !== null ? ` (${r.score}/100)` : ""} — {r.feedback}
+              {r.gradingDraftId && (
+                <span className="block text-sm">
+                  Parent {r.draftAction} a synthetic test draft. Not real AI
+                  grading.
+                </span>
+              )}
+            </p>
+          ))}
+        </div>
+      ))}
+      {["assigned", "needs_revision"].includes(a.status) && (
+        <form onSubmit={submit} className="space-y-3 border-t pt-3">
+          <h3 className="font-semibold">Submit completed work</h3>
+          <label className="block">
+            Notes
+            <textarea name="notes" maxLength={10000} className={field} />
+          </label>
+          <label className="block">
+            Sample photo or screenshot (PNG/JPEG, 1 MB each, up to two)
+            <input
+              className={field}
+              name="images"
+              type="file"
+              accept="image/png,image/jpeg"
+              multiple
+            />
+          </label>
+          {fileError && <p role="alert">{fileError}</p>}
+          <button className={button} disabled={busy || reading}>
+            {reading ? "Reading images..." : "Submit for parent review"}
+          </button>
+        </form>
+      )}
+      {parent && latest && (
+        <>
+          <GradingDrafts
+            key={latest.id}
+            studentId={studentId}
+            assignmentId={a.id}
+            submissionId={latest.id}
+            onApply={applyDraft}
+          />
+          <details ref={reviewDetails}>
+            <summary className="cursor-pointer font-semibold">
+              Parent review / override
+            </summary>
+            <form ref={reviewForm} onSubmit={review} className="space-y-3 mt-3">
+              {reviewDraft && (
+                <div className="border border-amber-400 bg-amber-50 p-3 space-y-2">
+                  <p>
+                    You are reviewing SIMULATED test output, not a real AI
+                    grade. Only your saved decision changes the assignment.
+                  </p>
+                  <label className="block">
+                    Draft review action
+                    <select
+                      aria-label="Draft review action"
+                      className={field}
+                      value={draftAction}
+                      onChange={(e) =>
+                        setDraftAction(
+                          e.target.value as "accepted" | "overridden",
+                        )
+                      }
+                    >
+                      <option value="accepted">
+                        Accept unchanged test suggestion
+                      </option>
+                      <option value="overridden">
+                        Override with my own evaluation
+                      </option>
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    className="underline"
+                    onClick={() => {
+                      setReviewDraft(null);
+                      reviewForm.current?.reset();
+                    }}
+                  >
+                    Clear draft and review manually
+                  </button>
+                </div>
+              )}
+              <label className="block">
+                Decision
+                <select aria-label="Decision" name="decision" className={field}>
+                  <option value="approved">Approve</option>
+                  <option value="needs_revision">Request revision</option>
+                </select>
+              </label>
+              <label className="block">
+                Feedback
+                <textarea
+                  name="feedback"
+                  onChange={() => {
+                    if (reviewDraft) setDraftAction("overridden");
+                  }}
+                  required
+                  maxLength={10000}
+                  className={field}
+                />
+              </label>
+              <label className="block">
+                Score (optional, 0–100)
+                <input
+                  name="score"
+                  onChange={() => {
+                    if (reviewDraft) setDraftAction("overridden");
+                  }}
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={1}
+                  className={field}
+                />
+              </label>
+              <button className={button} disabled={busy}>
+                Save parent review
+              </button>
+            </form>
+          </details>
+        </>
+      )}
+    </article>
+  );
+}

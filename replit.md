@@ -1,6 +1,10 @@
-# [Project name]
+# AnchorOne homeschool platform
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Curriculum authoring, verified family/child sessions, daily work and recurring lessons, private submissions, parent review, and year portfolios. The current branch permits local synthetic data only; production release gates remain in place.
+
+- [Implementation phases and risks](docs/IMPLEMENTATION-PLAN.md)
+- [Local setup and verification](docs/LOCAL-DEVELOPMENT.md)
+- [Family sessions and release blockers](docs/AUTHORIZATION-DESIGN.md)
 
 ## Run & Operate
 
