@@ -1,35 +1,205 @@
-// Placeholder landing page. The legacy Prisma/SQLite dashboard was retired when
-// the Firebase data layer landed; the real UI (import/approval, age-adapted
-// student experience, dashboards) is built in later phases — see
-// docs/launch-readiness.md §B.5.
+// Parent dashboard (home). Replaces the old "under construction" placeholder
+// with an at-a-glance view of what needs the parent's attention: curriculum
+// approvals, grades to review, and schedule proposals — each a live count that
+// links into its queue.
+//
+// Server component: it reads through the same authorized queue loaders the
+// feature pages use. Those throw when there is no seeded dev household / the
+// emulator isn't running, so each read is isolated with allSettled and a queue
+// that fails to load degrades to a "—" tile instead of taking down the page.
 
-export default function Home() {
+import Link from 'next/link';
+import { listPendingApprovals } from './approvals/data';
+import { listPendingAssessments } from './grades/data';
+import { listPendingProposals } from './plans/data';
+
+export const dynamic = 'force-dynamic'; // always reflect the live queues
+
+/** A count that either loaded (number) or couldn't be read (null). */
+type Count = number | null;
+
+async function countOf<T>(load: () => Promise<T[]>): Promise<Count> {
+  try {
+    return (await load()).length;
+  } catch {
+    return null;
+  }
+}
+
+export default async function Home() {
+  const [approvals, grades, plans] = await Promise.all([
+    countOf(listPendingApprovals),
+    countOf(listPendingAssessments),
+    countOf(listPendingProposals),
+  ]);
+
+  const anyLoaded = [approvals, grades, plans].some((c) => c !== null);
+  const totalWaiting = [approvals, grades, plans].reduce<number>(
+    (n, c) => n + (c ?? 0),
+    0,
+  );
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Lucas Align Homeschool</h1>
-        <p className="mt-1 text-neutral-500">
-          Parent-directed homeschool coordination. Backend scaffolding is in
-          place; the product UI is under construction.
+    <div className="space-y-8">
+      <section>
+        <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+          Lucas Align Homeschool
         </p>
-      </div>
+        <h1 className="mt-1 text-3xl font-bold tracking-tight">
+          Welcome back 👋
+        </h1>
+        <p className="mt-2 max-w-prose text-stone-600 dark:text-stone-300">
+          {anyLoaded
+            ? totalWaiting > 0
+              ? `You have ${totalWaiting} item${totalWaiting === 1 ? '' : 's'} waiting for your review across your queues.`
+              : 'Everything is reviewed — nothing is waiting on you right now. Nicely done.'
+            : 'Here’s your home base. Connect a dev household to see live counts below.'}
+        </p>
+      </section>
 
-      <div className="rounded-xl border border-dashed border-neutral-300 p-6 text-sm text-neutral-500 dark:border-neutral-700">
-        <p className="font-medium text-neutral-700 dark:text-neutral-300">
-          Domain modules 0–8 are scaffolded and unit-tested.
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <StatCard
+          href="/approvals"
+          emoji="📚"
+          label="Curriculum approvals"
+          count={approvals}
+          hint="Extracted drafts awaiting your gate"
+          accent="amber"
+        />
+        <StatCard
+          href="/grades"
+          emoji="✅"
+          label="Grades to review"
+          count={grades}
+          hint="AI assessments ready for approval"
+          accent="rose"
+        />
+        <StatCard
+          href="/plans"
+          emoji="🗓️"
+          label="Schedule proposals"
+          count={plans}
+          hint="Proposed plans awaiting approval"
+          accent="teal"
+        />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">
+          Quick actions
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <ActionCard
+            href="/curriculum/new"
+            emoji="➕"
+            title="Import curriculum"
+            description="Add a new source and let extraction draft the lessons."
+          />
+          <ActionCard
+            href="/curriculum"
+            emoji="🗂️"
+            title="Browse curriculum"
+            description="See everything you've approved and what's in progress."
+          />
+        </div>
+      </section>
+
+      {!anyLoaded ? (
+        <p className="rounded-2xl border border-dashed border-amber-300 bg-amber-50/60 px-4 py-3 text-sm text-amber-800 dark:border-amber-800/60 dark:bg-amber-950/30 dark:text-amber-300">
+          Live counts are hidden because no household is connected for this dev
+          session. Run{' '}
+          <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">
+            npm run emulators:seed
+          </code>{' '}
+          to populate the queues.
         </p>
-        <p className="mt-2">
-          See{" "}
-          <code className="rounded bg-neutral-100 px-1 dark:bg-neutral-800">
-            docs/mvp-specification.md
-          </code>{" "}
-          for the specification and{" "}
-          <code className="rounded bg-neutral-100 px-1 dark:bg-neutral-800">
-            docs/launch-readiness.md
-          </code>{" "}
-          for what remains before a pilot.
+      ) : null}
+    </div>
+  );
+}
+
+const ACCENTS = {
+  amber: {
+    ring: 'hover:border-amber-300 dark:hover:border-amber-700/70',
+    chip: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
+  },
+  rose: {
+    ring: 'hover:border-rose-300 dark:hover:border-rose-700/70',
+    chip: 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300',
+  },
+  teal: {
+    ring: 'hover:border-teal-300 dark:hover:border-teal-700/70',
+    chip: 'bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300',
+  },
+} as const;
+
+function StatCard({
+  href,
+  emoji,
+  label,
+  count,
+  hint,
+  accent,
+}: {
+  href: string;
+  emoji: string;
+  label: string;
+  count: Count;
+  hint: string;
+  accent: keyof typeof ACCENTS;
+}) {
+  const a = ACCENTS[accent];
+  return (
+    <Link
+      href={href}
+      className={`group flex flex-col gap-3 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600 dark:border-stone-800 dark:bg-stone-900 ${a.ring}`}
+    >
+      <div className="flex items-center justify-between">
+        <span
+          className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg ${a.chip}`}
+          aria-hidden
+        >
+          {emoji}
+        </span>
+        <span className="text-3xl font-bold tabular-nums text-stone-900 dark:text-stone-100">
+          {count ?? '—'}
+        </span>
+      </div>
+      <div>
+        <p className="font-semibold text-stone-900 dark:text-stone-100">{label}</p>
+        <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">{hint}</p>
+      </div>
+    </Link>
+  );
+}
+
+function ActionCard({
+  href,
+  emoji,
+  title,
+  description,
+}: {
+  href: string;
+  emoji: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group flex items-start gap-3 rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-amber-300 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600 dark:border-stone-800 dark:bg-stone-900 dark:hover:border-amber-700/70"
+    >
+      <span className="text-xl" aria-hidden>
+        {emoji}
+      </span>
+      <div>
+        <p className="font-semibold text-stone-900 group-hover:text-amber-700 dark:text-stone-100 dark:group-hover:text-amber-400">
+          {title}
+        </p>
+        <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
+          {description}
         </p>
       </div>
-    </div>
+    </Link>
   );
 }
