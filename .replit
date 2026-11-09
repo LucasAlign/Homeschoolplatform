@@ -1,0 +1,18 @@
+# Replit run config for the Next.js app.
+#
+# Replit only detects an app once it binds to 0.0.0.0 on a MAPPED port; the bare
+# `next dev` binds to localhost:3000, so the preview hangs on "your app is
+# starting". Bind 0.0.0.0 on port 3000 and map 3000 -> external 80 so Replit's
+# webview finds it. Cross-origin dev requests from the *.replit.dev proxy are
+# allowed via `allowedDevOrigins` in next.config.ts.
+
+modules = ["nodejs-20"]
+
+run = "npm install && npx next dev -H 0.0.0.0 -p 3000"
+
+[env]
+NEXT_TELEMETRY_DISABLED = "1"
+
+[[ports]]
+localPort = 3000
+externalPort = 80
