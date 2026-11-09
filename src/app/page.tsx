@@ -18,9 +18,26 @@ export const dynamic = 'force-dynamic'; // always reflect the live queues
 /** A count that either loaded (number) or couldn't be read (null). */
 type Count = number | null;
 
+// The stat tiles read live queues through firebase-admin. Those reads only
+// resolve against a configured backend (the local Firestore emulator in dev).
+// With no emulator host set, the Admin SDK takes the production path and can
+// block on credential discovery / an unreachable Firestore — which would spin
+// the home page forever (e.g. in a preview with no emulator). So only attempt
+// the reads when an emulator is configured, and still cap each one with a
+// timeout so an unreachable backend degrades to a "—" tile instead of hanging.
+const BACKEND_CONFIGURED = !!process.env.FIRESTORE_EMULATOR_HOST;
+const READ_TIMEOUT_MS = 2500;
+
 async function countOf<T>(load: () => Promise<T[]>): Promise<Count> {
+  if (!BACKEND_CONFIGURED) return null;
   try {
-    return (await load()).length;
+    const rows = await Promise.race([
+      load(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('read timed out')), READ_TIMEOUT_MS),
+      ),
+    ]);
+    return rows.length;
   } catch {
     return null;
   }
