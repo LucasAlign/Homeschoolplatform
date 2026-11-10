@@ -52,7 +52,12 @@ export default defineConfig({
   server: {
     port,
     strictPort: true,
-    host: '127.0.0.1',
+    // Bind all interfaces so Replit's preview proxy can reach the dev server
+    // (127.0.0.1 is unreachable from outside the container). allowedHosts lets
+    // the rotating *.replit.dev proxy host through Vite's host check — without
+    // it Vite returns "Blocked request … add to server.allowedHosts".
+    host: true,
+    allowedHosts: true,
     proxy: { '/api': 'http://127.0.0.1:5000' },
     fs: {
       strict: true,
@@ -60,6 +65,7 @@ export default defineConfig({
   },
   preview: {
     port,
-    host: '127.0.0.1',
+    host: true,
+    allowedHosts: true,
   },
 });
