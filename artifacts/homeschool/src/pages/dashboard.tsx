@@ -15,8 +15,77 @@ import {
 // utilities rather than the app's monochrome "Swiss atelier" tokens, so the rest
 // of the app is unaffected until we decide to roll the warmth app-wide.
 
+// Dev-only UI preview mode (VITE_PREVIEW_UI=1): render the dashboard with
+// sample data so the design can be reviewed without a database or login.
+// Never enabled in production.
+const PREVIEW_UI = import.meta.env.VITE_PREVIEW_UI === "1";
+
+const SAMPLE_DASHBOARD = {
+  courseCount: 6,
+  lessonCount: 48,
+  recentCourses: [
+    {
+      id: "sample-1",
+      title: "Exploring Life Science",
+      subject: "Science",
+      gradeLevel: "Grade 5",
+      published: true,
+      unitCount: 6,
+      lessonCount: 24,
+    },
+    {
+      id: "sample-2",
+      title: "Story of the World: Ancients",
+      subject: "History",
+      gradeLevel: "Grade 4",
+      published: true,
+      unitCount: 4,
+      lessonCount: 16,
+    },
+    {
+      id: "sample-3",
+      title: "Singapore Math 3B",
+      subject: "Mathematics",
+      gradeLevel: "Grade 3",
+      published: false,
+      unitCount: 5,
+      lessonCount: 20,
+    },
+    {
+      id: "sample-4",
+      title: "Writing With Ease",
+      subject: "Language Arts",
+      gradeLevel: "Grade 2",
+      published: true,
+      unitCount: 3,
+      lessonCount: 12,
+    },
+    {
+      id: "sample-5",
+      title: "Beginning Latin Roots",
+      subject: "Latin",
+      gradeLevel: "Grade 6",
+      published: false,
+      unitCount: 2,
+      lessonCount: 8,
+    },
+    {
+      id: "sample-6",
+      title: "Nature Journaling & Art",
+      subject: "Art",
+      gradeLevel: "All ages",
+      published: true,
+      unitCount: 4,
+      lessonCount: 10,
+    },
+  ],
+};
+
 export default function DashboardPage() {
-  const { data: dashboard, isLoading, error } = useGetDashboard();
+  const query = useGetDashboard();
+  const dashboard = PREVIEW_UI ? SAMPLE_DASHBOARD : query.data;
+  const isLoading = PREVIEW_UI ? false : query.isLoading;
+  const error = PREVIEW_UI ? null : query.error;
 
   if (isLoading) {
     return (

@@ -8,8 +8,27 @@ deploymentTarget = "autoscale"
 args = ["pnpm", "store", "prune"]
 env = { "CI" = "true" }
 
+# UI preview: the Vite dev server binds 0.0.0.0:5173 (see vite.config.ts
+# host:true) and is mapped to the external preview on port 80.
+[[ports]]
+localPort = 5173
+externalPort = 80
+
 [workflows]
 runButton = "Project"
+
+# DB-free UI preview. Runs ONLY the Vite frontend with VITE_PREVIEW_UI=1, which
+# makes the app bypass the auth/session backend and render the dashboard with
+# sample data — no database or login needed. To run the real stack instead,
+# unset VITE_PREVIEW_UI and start the API server (PORT=5000) alongside Vite.
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=5173 VITE_PREVIEW_UI=1 pnpm --filter @workspace/homeschool run dev"
+waitForPort = 5173
 
 [agent]
 stack = "PNPM_WORKSPACE"

@@ -89,6 +89,11 @@ export function PasswordSettings() {
     </details>
   );
 }
+// Dev-only UI preview mode. When VITE_PREVIEW_UI=1, bypass the auth/session
+// backend entirely and expose a synthetic "parent" session so the UI can be
+// reviewed without a database or login. Never enable this in production.
+const PREVIEW_UI = import.meta.env.VITE_PREVIEW_UI === "1";
+
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [error, setError] = useState("");
@@ -182,6 +187,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setSession((s) => (s ? { ...s, user: null } : null));
     events.current?.postMessage("changed");
   }
+  if (PREVIEW_UI)
+    return (
+      <SessionContext.Provider
+        value={{ parent: true, mode: "synthetic", logout: async () => {} }}
+      >
+        {children}
+      </SessionContext.Provider>
+    );
   if (session?.mode === "synthetic" || session?.user)
     return (
       <SessionContext.Provider
