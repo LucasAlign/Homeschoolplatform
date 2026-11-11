@@ -57,61 +57,61 @@
   --elevate-1: transparent;
   --elevate-2: transparent;
 
-  /* Swiss atelier aesthetic */
-  --background: 0 0% 100%;
-  --foreground: 0 0% 0%;
-  --border: 0 0% 0%;
-  
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 0%;
-  --card-border: 0 0% 0%;
-  
-  --sidebar: 0 0% 100%;
-  --sidebar-foreground: 0 0% 0%;
-  --sidebar-border: 0 0% 0%;
-  --sidebar-primary: 0 0% 0%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 0 0% 0%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-ring: 0 0% 0%;
-  
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 0%;
-  --popover-border: 0 0% 0%;
-  
-  --primary: 0 0% 0%;
-  --primary-foreground: 0 0% 100%;
-  
-  --secondary: 0 0% 100%;
-  --secondary-foreground: 0 0% 0%;
-  
-  --muted: 0 0% 100%;
-  --muted-foreground: 0 0% 61%; /* #9C9C9C */
-  
-  --accent: 0 0% 0%;
-  --accent-foreground: 0 0% 100%;
-  
-  --destructive: 0 0% 0%;
-  --destructive-foreground: 0 0% 100%;
-  
-  --input: 0 0% 100%;
-  --ring: 0 0% 0%;
-  
-  --chart-1: 0 0% 0%;
-  --chart-2: 0 0% 61%;
-  --chart-3: 0 0% 0%;
-  --chart-4: 0 0% 61%;
-  --chart-5: 0 0% 0%;
+  /* Warm, friendly palette */
+  --background: 40 33% 98%;
+  --foreground: 25 18% 16%;
+  --border: 30 20% 88%;
 
-  --radius: 0;
-  --shadow-2xs: none;
-  --shadow-xs: none;
-  --shadow-sm: none;
-  --shadow: none;
-  --shadow-md: none;
-  --shadow-lg: none;
-  --shadow-xl: none;
-  --shadow-2xl: none;
+  --card: 0 0% 100%;
+  --card-foreground: 25 18% 16%;
+  --card-border: 30 20% 90%;
+
+  --sidebar: 40 33% 98%;
+  --sidebar-foreground: 25 18% 16%;
+  --sidebar-border: 30 20% 88%;
+  --sidebar-primary: 30 90% 48%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 33 75% 92%;
+  --sidebar-accent-foreground: 25 45% 28%;
+  --sidebar-ring: 30 90% 48%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 25 18% 16%;
+  --popover-border: 30 20% 90%;
+
+  --primary: 30 90% 48%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 36 40% 94%;
+  --secondary-foreground: 25 25% 25%;
+
+  --muted: 36 30% 95%;
+  --muted-foreground: 25 9% 45%;
+
+  --accent: 33 75% 92%;
+  --accent-foreground: 25 45% 28%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --input: 30 20% 90%;
+  --ring: 30 90% 48%;
+
+  --chart-1: 30 90% 48%;
+  --chart-2: 170 50% 40%;
+  --chart-3: 25 60% 55%;
+  --chart-4: 40 85% 60%;
+  --chart-5: 15 65% 50%;
+
+  --radius: 0.625rem;
+  --shadow-2xs: 0 1px 2px 0 hsl(25 25% 20% / 0.03);
+  --shadow-xs: 0 1px 2px 0 hsl(25 25% 20% / 0.04);
+  --shadow-sm: 0 1px 3px 0 hsl(25 25% 20% / 0.06), 0 1px 2px -1px hsl(25 25% 20% / 0.06);
+  --shadow: 0 1px 3px 0 hsl(25 25% 20% / 0.08), 0 1px 2px -1px hsl(25 25% 20% / 0.06);
+  --shadow-md: 0 4px 6px -1px hsl(25 25% 20% / 0.08), 0 2px 4px -2px hsl(25 25% 20% / 0.06);
+  --shadow-lg: 0 10px 15px -3px hsl(25 25% 20% / 0.08), 0 4px 6px -4px hsl(25 25% 20% / 0.05);
+  --shadow-xl: 0 20px 25px -5px hsl(25 25% 20% / 0.08), 0 8px 10px -6px hsl(25 25% 20% / 0.05);
+  --shadow-2xl: 0 25px 50px -12px hsl(25 25% 20% / 0.18);
   
   --tracking-normal: 0em;
   --spacing: 0.25rem;
@@ -212,7 +212,7 @@
   }
 
   ::selection {
-    background: #000;
+    background: hsl(30 90% 48%);
     color: #fff;
   }
 }
