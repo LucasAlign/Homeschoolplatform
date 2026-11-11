@@ -8,8 +8,33 @@ deploymentTarget = "autoscale"
 args = ["pnpm", "store", "prune"]
 env = { "CI" = "true" }
 
+# Preview port mapping. The Vite dev server (the frontend) is what the preview
+# must show; it binds 0.0.0.0:5173 (see vite.config.ts host:true) and is mapped
+# to the external preview on port 80. The API server listens on 127.0.0.1:5000
+# and is reached only by Vite's internal /api proxy, so it is NOT exposed here.
+[[ports]]
+localPort = 5173
+externalPort = 80
+
 [workflows]
 runButton = "Project"
+
+# The app is two processes that must run together:
+#   1. the Express API on port 5000 (serves /api only)
+#   2. the Vite frontend on port 5173 (serves the UI, proxies /api -> :5000)
+# Both read process.env.PORT, so each task sets its own PORT to avoid a clash.
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=5000 pnpm --filter @workspace/api-server run dev"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=5173 pnpm --filter @workspace/homeschool run dev"
+waitForPort = 5173
 
 [agent]
 stack = "PNPM_WORKSPACE"
